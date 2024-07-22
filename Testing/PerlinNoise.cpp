@@ -435,31 +435,16 @@ glm::vec2 PerlinNoise::CalculateGradient(int x, int z, int width, int depth, con
     return glm::vec2((heightRight - heightCenter) / epsilon, (heightUp - heightCenter) / epsilon);
 }
 
-void PerlinNoise::InitializePermutationVector()
-{
+void  PerlinNoise::InitializePermutationVector() {
     p.resize(512);
     std::iota(p.begin(), p.begin() + 256, 0);
     std::random_device rd;
     std::mt19937 g(rd());
     std::shuffle(p.begin(), p.begin() + 256, g);
-    std::memcpy(p.data() + 256, p.data(), 256 * sizeof(int));
+    std::copy(p.begin(), p.begin() + 256, p.begin() + 256);
 }
 
-float PerlinNoise::Fade(float t) {
-    return t * t * t * (t * (t * 6 - 15) + 10);
-}
-
-float PerlinNoise::Lerp(float t, float a, float b) {
-    return a + t * (b - a);
-}
-
-float PerlinNoise::Grad(int hash, float x, float y, float z) {
-    int h = hash & 15;
-    float u = h < 8 ? x : y;
-    float v = h < 4 ? y : h == 12 || h == 14 ? x : z;
-    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
-}
-
+//This function combines the gradients and interpolation to produce a single noise value for any 3D point, creating the Perlin noise effect.
 float PerlinNoise::Noise(float x, float y, float z) {
     int X = (int)floor(x) & 255;
     int Y = (int)floor(y) & 255;
@@ -490,30 +475,103 @@ float PerlinNoise::Noise(float x, float y, float z) {
                 Grad(p[BB + 1], x - 1, y - 1, z - 1))));
 }
 
+/**
+ * @brief Generates Perlin noise with multiple octaves to add finer details.
+ *
+ * This function combines multiple layers (octaves) of Perlin noise at different
+ * frequencies and amplitudes. Each octave adds finer details to the noise.
+ *
+ * @param x The x-coordinate of the input point.
+ * @param y The y-coordinate of the input point.
+ * @param z The z-coordinate of the input point.
+ * @param octaves The number of layers (octaves) of noise to combine.
+ * @param persistence Controls the decrease in amplitude of each subsequent octave.
+ * @return A float representing the Perlin noise value at the given point.
+ *
+ * Example:
+ * ```
+ * PerlinNoise perlin;
+ * float noiseValue = perlin.OctaveNoise(0.5, 0.5, 0.5, 4, 0.5);
+ * // This will generate Perlin noise at point (0.5, 0.5, 0.5) using 4 octaves and a persistence of 0.5.
+ * ```
+ *
+ * Visual Example:
+ * Consider generating noise with 3 octaves (octaves = 3) and persistence = 0.5:
+ * 1. Octave 1: frequency = 1, amplitude = 1
+ * 2. Octave 2: frequency = 2, amplitude = 0.5
+ * 3. Octave 3: frequency = 4, amplitude = 0.25
+ *
+ * For a point (x, y, z):
+ * - Calculate the noise value at each octave with the corresponding frequency and amplitude.
+ * - Sum the weighted noise values.
+ * - Normalize the result to ensure it stays within the range [0, 1].
+ */
 float PerlinNoise::OctaveNoise(float x, float y, float z, int octaves, float persistence) {
-    float total = 0;
-    float frequency = 1;
-    float amplitude = 1;
-    float maxValue = 0;
+    float total     = 0;   // Total accumulated noise value
+    float frequency = 1;   // Initial frequency
+    float amplitude = 1;   // Initial amplitude
+    float maxValue  = 0;   // Accumulates the total of all amplitudes for normalization
+
+    // Loop through each octave
     for (int i = 0; i < octaves; i++) {
+        // Calculate noise for the current octave and add it to the total
         total += Noise(x * frequency, y * frequency, z * frequency) * amplitude;
+
+        // Accumulate the current amplitude to maxValue
         maxValue += amplitude;
+
+        // Adjust amplitude and frequency for the next octave
         amplitude *= persistence;
         frequency *= 2;
     }
+
+    // Normalize the result to ensure it stays within the range [0, 1]
     return total / maxValue;
 }
 
+/**
+ * @brief Generates a 2D array of Perlin noise values.
+ *
+ * This function generates a 2D array of Perlin noise values using multiple
+ * octaves for added detail. The noise values are clamped to the range [0, 1].
+ *
+ *
+ * Visual Example:
+ * Imagine a 2D grid of size 4x4. Each cell in the grid will get a Perlin noise value.
+ * Let's assume `octaveCount = 2` and `persistence = 0.5`.
+ *
+ * 1. Normalize coordinates to [-0.5, 0.5]:
+ *    - For x = 0: nx = 0 / 4 - 0.5 = -0.5
+ *    - For y = 0: ny = 0 / 4 - 0.5 = -0.5
+ * 2. Calculate OctaveNoise for each point:
+ *    - Octave 1: Noise(-0.5, -0.5, 0.5) * 1
+ *    - Octave 2: Noise(-1.0, -1.0, 1.0) * 0.5
+ *    - Sum and normalize the result.
+ *
+ * @details The perlinNoise array will be populated with values for a visual representation, such as:
+ * [ 0.43, 0.55, 0.62, 0.50,
+ *   0.48, 0.60, 0.70, 0.58,
+ *   0.52, 0.63, 0.73, 0.62,
+ *   0.50, 0.60, 0.68, 0.57 ]
+ */
 void PerlinNoise::GeneratePerlinNoise() {
-   // perlinNoise.resize(outputWidth * outputDepth);
+    // Loop through each pixel in the output grid
     for (int y = 0; y < outputDepth; y++) {
         for (int x = 0; x < outputWidth; x++) {
+            // Normalize the coordinates to the range [-0.5, 0.5]
             float nx = (float)x / outputWidth - 0.5f;
             float ny = (float)y / outputDepth - 0.5f;
-            perlinNoise[y * outputWidth + x] = OctaveNoise(nx * 4, ny * 4, 0.5f, octaveCount, persistence);
+
+            // Generate the Perlin noise value at the current coordinates using octave noise
+            float value = OctaveNoise(nx, ny, 0.5f, octaveCount, persistence);
+
+            // Clamp the noise value to the range [0, 1] and store it in the output array
+            value = std::max(0.0f, std::min(1.0f, (value + 1.0f) * 0.5f));
+            perlinNoise[y * outputWidth + x] = value;
         }
     }
 }
+
 
 void PerlinNoise::GeneratePerlinNoiseWithGradient() {
     //perlinNoiseWithGradient.resize(outputWidth * outputDepth);
@@ -524,7 +582,9 @@ void PerlinNoise::GeneratePerlinNoiseWithGradient() {
         for (int x = 0; x < outputWidth; x++) {
             float nx = (float)x / outputWidth - 0.5f;
             float ny = (float)y / outputDepth - 0.5f;
-            perlinNoiseWithGradient[y * outputWidth + x] = OctaveNoise(nx * 4, ny * 4, 0.5f, octaveCount, persistence);
+            float value = OctaveNoise(nx, ny, 0.5f, octaveCount, persistence);
+            value = std::max(0.0f, std::min(1.0f, (value + 1.0f) * 0.5f));
+            perlinNoiseWithGradient[y * outputWidth + x] = value;
         }
     }
 
@@ -541,7 +601,11 @@ void PerlinNoise::GeneratePerlinNoiseWithGradient() {
             glm::vec2 gradient = gradients[y * outputWidth + x];
             float gradientMagnitude = glm::length(gradient);
             float gradientInfluence = 1.0f - glm::min(gradientMagnitude * gradientFactor, 1.0f);
-            perlinNoiseWithGradient[y * outputWidth + x] *= gradientInfluence;
+
+            // Apply gradient influence and clamp the result
+            float& value = perlinNoiseWithGradient[y * outputWidth + x];
+            value *= gradientInfluence;
+            value = std::max(0.0f, std::min(1.0f, value));
         }
     }
 }
