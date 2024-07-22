@@ -17,7 +17,7 @@ public:
         : _sceneManager(sceneManager), _name(name), elapsedTime(0.0f),
         m_cameraSpeed(2.5f), m_cameraFront(glm::vec3(0.0f, 0.0f, -1.0f)), m_cameraUp(glm::vec3(0.0f, 1.0f, 0.0f)),
         camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f, (float)GLHelper::width / (float)GLHelper::height, 0.1f, 100.0f),
-        outputWidth(512), outputDepth(512), octaveCount(8), persistence(0.5f), heightMultiplier(0.20f),
+        outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.20f),
         gradientFactor(5.03f)
     {
 		perlinNoise.resize(outputWidth * outputDepth);
@@ -107,7 +107,7 @@ private:
      * ```
      */
     static inline float Lerp(float t, float a, float b) {
-		return (a - b) * (3.0 - t * 2.0) * t * t + b;
+        return a + t * (b - a);
     }
 
     /**
@@ -135,7 +135,7 @@ private:
      * // gradient will be calculated based on the hash value and the coordinates.
      * ```
      */   
-    static inline float Grad(int hash, float x, float y, float z) {
+     static inline float Grad(int hash, float x, float y, float z) {
         int h = hash & 15;
         float u = h < 8 ? x : y;
         float v = h < 4 ? y : h == 12 || h == 14 ? x : z;

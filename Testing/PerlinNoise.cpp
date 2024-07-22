@@ -444,20 +444,42 @@ void  PerlinNoise::InitializePermutationVector() {
     std::copy(p.begin(), p.begin() + 256, p.begin() + 256);
 }
 
-//This function combines the gradients and interpolation to produce a single noise value for any 3D point, creating the Perlin noise effect.
+/**
+ * @brief Generates Perlin noise for a given point (x, y, z) in 3D space.
+ *
+ * This function computes the Perlin noise value for a given 3D point by interpolating
+ * between gradients at surrounding grid points. It uses a combination of gradient
+ * vectors, fade curves, and linear interpolation to achieve smooth transitions.
+ *
+ * @param x The x-coordinate of the input point.
+ * @param y The y-coordinate of the input point.
+ * @param z The z-coordinate of the input point.
+ * @return A float representing the Perlin noise value at the given point.
+ *
+ * Example:
+ * ```
+ * PerlinNoise perlin;
+ * float noiseValue = perlin.Noise(1.5, 2.5, 3.5);
+ * // This will generate the Perlin noise value at the point (1.5, 2.5, 3.5).
+ * ```
+ */
 float PerlinNoise::Noise(float x, float y, float z) {
+    // Determine the grid cell coordinates containing the point (x, y, z)
     int X = (int)floor(x) & 255;
     int Y = (int)floor(y) & 255;
     int Z = (int)floor(z) & 255;
 
+    // Get the relative position of the point within the grid cell
     x -= floor(x);
     y -= floor(y);
     z -= floor(z);
 
+    // Compute fade curves for x, y, z
     float u = Fade(x);
     float v = Fade(y);
     float w = Fade(z);
 
+    // Hash coordinates of the 8 cube corners
     int A = p[X] + Y;
     int AA = p[A] + Z;
     int AB = p[A + 1] + Z;
@@ -465,14 +487,30 @@ float PerlinNoise::Noise(float x, float y, float z) {
     int BA = p[B] + Z;
     int BB = p[B + 1] + Z;
 
-    return Lerp(w, Lerp(v, Lerp(u, Grad(p[AA], x, y, z),
-        Grad(p[BA], x - 1, y, z)),
-        Lerp(u, Grad(p[AB], x, y - 1, z),
-            Grad(p[BB], x - 1, y - 1, z))),
-        Lerp(v, Lerp(u, Grad(p[AA + 1], x, y, z - 1),
-            Grad(p[BA + 1], x - 1, y, z - 1)),
-            Lerp(u, Grad(p[AB + 1], x, y - 1, z - 1),
-                Grad(p[BB + 1], x - 1, y - 1, z - 1))));
+    // Interpolate the results from the 8 corners of the cube
+    // The interpolation is performed in three dimensions:
+    return Lerp(w,
+        Lerp(v,
+            Lerp(u,
+                Grad(p[AA], x, y, z),
+                Grad(p[BA], x - 1, y, z)
+            ),
+            Lerp(u,
+                Grad(p[AB], x, y - 1, z),
+                Grad(p[BB], x - 1, y - 1, z)
+            )
+        ),
+        Lerp(v,
+            Lerp(u,
+                Grad(p[AA + 1], x, y, z - 1),
+                Grad(p[BA + 1], x - 1, y, z - 1)
+            ),
+            Lerp(u,
+                Grad(p[AB + 1], x, y - 1, z - 1),
+                Grad(p[BB + 1], x - 1, y - 1, z - 1)
+            )
+        )
+    );
 }
 
 /**
