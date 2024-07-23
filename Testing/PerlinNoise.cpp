@@ -298,6 +298,7 @@ void PerlinNoise::GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData
 
     // Adjust water level and color palettes
     float waterLevel = minHeight + (maxHeight - minHeight) * 0.35f;
+
     glm::vec3 deepWaterColor(0.0f, 0.05f, 0.3f);
     glm::vec3 shallowWaterColor(0.0f, 0.4f, 0.8f);
     glm::vec3 sandColor(0.76f, 0.7f, 0.5f);
@@ -328,7 +329,7 @@ void PerlinNoise::GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData
             float originalHeight = noiseData[z * outputWidth + x];
 
             // Exaggerate the height
-            float exaggeratedHeight = glm::pow((originalHeight - minHeight) / (maxHeight - minHeight), heightExaggeration);
+            float exaggeratedHeight = std::sqrt((originalHeight - minHeight) / (maxHeight - minHeight));
             float y = minHeight + exaggeratedHeight * (maxHeight - minHeight);
 
             glm::vec3 position(x / static_cast<float>(outputWidth - 1) - 0.5f, y * heightMultiplier, z / static_cast<float>(outputDepth - 1) - 0.5f);
