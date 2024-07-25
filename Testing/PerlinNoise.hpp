@@ -25,22 +25,41 @@ public:
     void SetTargetSize(int size) { m_targetSize = size; }
 
     std::vector<float> GenerateTerrain() {
-        std::vector<float> heightMap = GenerateLowResStartingImage();
+        std::vector<std::vector<float>> heightMaps;
+        heightMaps.push_back(GenerateLowResStartingImage());
 
-        while (static_cast<int>(heightMap.size()) < m_targetSize * m_targetSize) {
-            heightMap = UpscaleHeightMap(heightMap);
+        while (static_cast<int>(std::sqrt(heightMaps.back().size())) < m_targetSize) {
+            std::vector<float> upscaledHeightMap = UpscaleHeightMap(heightMaps.back());
+
+            // Create a blurry version at the current scale
+            std::vector<float> blurryHeightMap = FinalBlur(upscaledHeightMap);
+
+            // Add details from the crisp version to the blurry version
+            AddDetails(blurryHeightMap, upscaledHeightMap);
+
+            // Normalize and enhance contrast for both versions
+            NormalizeAndEnhanceContrast(upscaledHeightMap);
+            NormalizeAndEnhanceContrast(blurryHeightMap);
+
+            // Use the combined version as the new heightMap for the next iteration
+            heightMaps.push_back(blurryHeightMap);
         }
 
-        heightMap = FinalBlur(heightMap);
-        NormalizeAndEnhanceContrast(heightMap);
+        // Apply the formula to each height map
+        for (auto& heightMap : heightMaps) {
+            ApplyFormula(heightMap);
+        }
+
+        std::vector<float> finalHeightMap = heightMaps.back();
+        NormalizeAndEnhanceContrast(finalHeightMap);
 
         // Debug output
         std::cout << "DLA Terrain Generation:" << std::endl;
-        std::cout << "Min Height: " << *std::min_element(heightMap.begin(), heightMap.end()) << std::endl;
-        std::cout << "Max Height: " << *std::max_element(heightMap.begin(), heightMap.end()) << std::endl;
-        std::cout << "Size: " << heightMap.size() << std::endl;
+        std::cout << "Min Height: " << *std::min_element(finalHeightMap.begin(), finalHeightMap.end()) << std::endl;
+        std::cout << "Max Height: " << *std::max_element(finalHeightMap.begin(), finalHeightMap.end()) << std::endl;
+        std::cout << "Size: " << std::sqrt(finalHeightMap.size()) << "x" << std::sqrt(finalHeightMap.size()) << std::endl;
 
-        return heightMap;
+        return finalHeightMap;
     }
 
 private:
@@ -115,6 +134,18 @@ private:
 
             // Enhance contrast
             height = std::pow(height, 1.5f);
+        }
+    }
+
+    void AddDetails(std::vector<float>& blurry, const std::vector<float>& crisp) {
+        for (size_t i = 0; i < blurry.size(); ++i) {
+            blurry[i] += (crisp[i] - blurry[i]) * 0.5f; // Adjust the factor to control the amount of detail added
+        }
+    }
+
+    void ApplyFormula(std::vector<float>& heightMap) {
+        for (float& height : heightMap) {
+            height = 1 - 1 / (1 + height);
         }
     }
 };
