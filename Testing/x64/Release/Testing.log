@@ -1,5 +1,6 @@
 ﻿  PerlinNoise.cpp
-C:\Users\bjorn\Desktop\csd350_bjornpokin_Perlin_Noise\perlin-noise\Testing\PerlinNoise.cpp(266,53): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\bjorn\Desktop\csd350_bjornpokin_Perlin_Noise\perlin-noise\Testing\PerlinNoise.cpp(250,53): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\bjorn\Desktop\csd350_bjornpokin_Perlin_Noise\perlin-noise\Testing\PerlinNoise.cpp(263,57): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
   main.cpp
 C:\Users\bjorn\Desktop\csd350_bjornpokin_Perlin_Noise\perlin-noise\Testing\Assignment2.h(986,65): warning C4267: 'argument': conversion from 'size_t' to '_Ty', possible loss of data
 C:\Users\bjorn\Desktop\csd350_bjornpokin_Perlin_Noise\perlin-noise\Testing\Assignment2.h(986,65): warning C4267:         with
@@ -16,9 +17,9 @@ C:\Users\bjorn\Desktop\csd350_bjornpokin_Perlin_Noise\perlin-noise\Testing\Assig
   (compiling source file 'src/main.cpp')
   
   Generating code
-  253 of 2532 functions (10.0%) were compiled, the rest were copied from previous compilation.
-    125 functions were new in current compilation
-    90 functions had inline decision re-evaluated but remain unchanged
+  15 of 2555 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
+    5 functions were new in current compilation
+    71 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   Testing.vcxproj -> C:\Users\bjorn\Desktop\csd350_bjornpokin_Perlin_Noise\perlin-noise\x64\Release\CSD350.exe
           1 file(s) copied.

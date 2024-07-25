@@ -140,50 +140,41 @@ void PerlinNoise::update(double dt)
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Perlin Noise Controls");
+    ImGui::Begin("Terrain Generation Controls");
 
-    // Common controls
-    if (ImGui::SliderInt("Octave Count", &octaveCount, 1, 8))
+    // Add option to switch between Perlin noise and DLA
+    if (ImGui::Checkbox("Use DLA Terrain", &useDLA))
     {
         RegeneratePerlinNoise();
     }
 
-    if (ImGui::SliderFloat("Height Multiplier", &heightMultiplier, 0.1f, 5.0f, "%.2f"))
+    if (useDLA)
     {
-        RegeneratePerlinNoise();
-    }
+        // DLA-specific controls
+        bool dlaParamsChanged = false;
+        dlaParamsChanged |= ImGui::SliderInt("Initial Size", &dlaInitialSize, 8, 64);
+        dlaParamsChanged |= ImGui::SliderInt("Target Size", &dlaTargetSize, 128, 1024);
 
-    // Gradient factor
-    if (ImGui::SliderFloat("Gradient Factor", &gradientFactor, 0.0f, 30.0f, "%.2f"))
-    {
-        RegeneratePerlinNoise();
-    }
-
-    if (ImGui::Button("Regenerate Both Terrains"))
-    {
-		InitializePermutationVector();
-        RegeneratePerlinNoise();
-    }
-    if (ImGui::SliderFloat("Persistence", &persistence, 0.1f, 1.0f, "%.2f"))
-    {
-        RegeneratePerlinNoise();
-    }
-    ImGui::Separator();
-
-    // Individual plane controls
-    const char* planeNames[] = { "Standard Perlin Noise", "Perlin Noise with Gradient" };
-    for (int i = 0; i < 2; ++i)
-    {
-        if (ImGui::TreeNode(planeNames[i]))
+        if (dlaParamsChanged)
         {
-            bool visible = true; 
-            if (ImGui::Checkbox("Visible", &visible))
-            {
-                // Empty for now. But can add plane specific stuff here for what planes we one.
-            }
-
-            ImGui::TreePop();
+            RegeneratePerlinNoise();
         }
+    }
+    else
+    {
+        // Existing Perlin noise controls
+        if (ImGui::SliderInt("Octave Count", &octaveCount, 1, 8) ||
+            ImGui::SliderFloat("Height Multiplier", &heightMultiplier, 0.1f, 5.0f, "%.2f") ||
+            ImGui::SliderFloat("Gradient Factor", &gradientFactor, 0.0f, 30.0f, "%.2f") ||
+            ImGui::SliderFloat("Persistence", &persistence, 0.1f, 1.0f, "%.2f"))
+        {
+            RegeneratePerlinNoise();
+        }
+    }
+
+    if (ImGui::Button("Regenerate Terrain"))
+    {
+        RegeneratePerlinNoise();
     }
 
     ImGui::End();
@@ -249,24 +240,31 @@ void PerlinNoise::draw()
     shdr_pgm.SetUniform("uLightPos", glm::vec3(5.0f, 5.0f, 5.0f));
     shdr_pgm.SetUniform("uViewPos", camera.getPosition());
 
-    // Draw both planes
-    for (int i = 0; i < 2; ++i)
-    {
-        glm::mat4 model = glm::mat4(5.0f);
+    // Draw terrain
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 mvp = projection * view * model;
+    shdr_pgm.SetUniform("mvpMatrix", mvp);
 
-        // Offset the second plane
-        if (i == 1) {
-            model = glm::translate(model, glm::vec3(1.5f, 0.0f, 0.0f));
+    if (useDLA) {
+        glBindVertexArray(vao[0]);
+        glDrawElements(GL_TRIANGLES, indices[0].size(), GL_UNSIGNED_INT, 0);
+    }
+    else {
+        // Draw both Perlin noise terrains
+        for (int i = 0; i < 2; ++i) {
+            model = glm::mat4(1.0f);
+            if (i == 1) {
+                model = glm::translate(model, glm::vec3(1.5f, 0.0f, 0.0f));
+            }
+            mvp = projection * view * model;
+            shdr_pgm.SetUniform("mvpMatrix", mvp);
+
+            glBindVertexArray(vao[i]);
+            glDrawElements(GL_TRIANGLES, indices[i].size(), GL_UNSIGNED_INT, 0);
         }
-
-        glm::mat4 mvp = projection * view * model;
-        shdr_pgm.SetUniform("mvpMatrix", mvp);
-
-        glBindVertexArray(vao[i]);
-        glDrawElements(GL_TRIANGLES, indices[i].size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
     }
 
+    glBindVertexArray(0);
     shdr_pgm.UnUse();
 
     ImGui::Render();
@@ -610,6 +608,116 @@ glm::vec2 PerlinNoise::CalculateGradient(int x, int z, int width, int depth, con
     return glm::vec2((heightRight - heightCenter) / epsilon, (heightUp - heightCenter) / epsilon);
 }
 
+// New method to generate DLA terrain
+void PerlinNoise::GenerateDLATerrain() {
+    dlaGenerator.SetInitialSize(dlaInitialSize);
+    dlaGenerator.SetTargetSize(dlaTargetSize);
+    dlaTerrain = dlaGenerator.GenerateTerrain();
+
+    // Resize dlaTerrain if necessary
+    if (dlaTerrain.size() != outputWidth * outputDepth) {
+        ResizeTerrain(dlaTerrain, outputWidth, outputDepth);
+    }
+}
+
+void PerlinNoise::GenerateDLATerrainMesh(std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices)
+{
+    outVertices.clear();
+    outIndices.clear();
+
+    float minHeight = *std::min_element(dlaTerrain.begin(), dlaTerrain.end());
+    float maxHeight = *std::max_element(dlaTerrain.begin(), dlaTerrain.end());
+    float heightRange = maxHeight - minHeight;
+
+    // Ensure we have a non-zero height range
+    if (heightRange < 0.001f) {
+        heightRange = 1.0f;
+    }
+
+    for (int z = 0; z < outputDepth; z++) {
+        for (int x = 0; x < outputWidth; x++) {
+            float height = dlaTerrain[z * outputWidth + x];
+            float normalizedHeight = (height - minHeight) / heightRange;
+
+            glm::vec3 position(
+                x / static_cast<float>(outputWidth - 1) - 0.5f,
+                normalizedHeight * heightMultiplier,
+                z / static_cast<float>(outputDepth - 1) - 0.5f
+            );
+            // More pronounced color gradient based on height
+            glm::vec3 color;
+            if (normalizedHeight < 0.2f) {
+                color = glm::vec3(0.0f, 0.0f, 0.5f); // Deep blue for water
+            }
+            else if (normalizedHeight < 0.4f) {
+                color = glm::vec3(0.76f, 0.7f, 0.5f); // Sand color for beaches
+            }
+            else if (normalizedHeight < 0.6f) {
+                color = glm::vec3(0.0f, 0.5f, 0.0f); // Green for lowlands
+            }
+            else if (normalizedHeight < 0.8f) {
+                color = glm::vec3(0.5f, 0.25f, 0.0f); // Brown for highlands
+            }
+            else {
+                color = glm::vec3(1.0f, 1.0f, 1.0f); // White for peaks
+            }
+
+            outVertices.push_back({ position, color });
+        }
+    }
+
+    // Generate indices (same as before)
+    for (int z = 0; z < outputDepth - 1; z++) {
+        for (int x = 0; x < outputWidth - 1; x++) {
+            int topLeft = z * outputWidth + x;
+            int topRight = topLeft + 1;
+            int bottomLeft = (z + 1) * outputWidth + x;
+            int bottomRight = bottomLeft + 1;
+
+            outIndices.push_back(topLeft);
+            outIndices.push_back(bottomLeft);
+            outIndices.push_back(topRight);
+
+            outIndices.push_back(topRight);
+            outIndices.push_back(bottomLeft);
+            outIndices.push_back(bottomRight);
+        }
+    }
+}
+
+void PerlinNoise::ResizeTerrain(std::vector<float>& terrain, int width, int depth)
+{
+    std::vector<float> resizedTerrain(width * depth);
+    int originalWidth = static_cast<int>(std::sqrt(terrain.size()));
+    int originalDepth = originalWidth;
+
+    for (int z = 0; z < depth; z++) {
+        for (int x = 0; x < width; x++) {
+            float srcX = x * (originalWidth - 1) / static_cast<float>(width - 1);
+            float srcZ = z * (originalDepth - 1) / static_cast<float>(depth - 1);
+            int x0 = static_cast<int>(srcX);
+            int z0 = static_cast<int>(srcZ);
+            int x1 = std::min(x0 + 1, originalWidth - 1);
+            int z1 = std::min(z0 + 1, originalDepth - 1);
+
+            float fx = srcX - x0;
+            float fz = srcZ - z0;
+
+            float h00 = terrain[z0 * originalWidth + x0];
+            float h10 = terrain[z0 * originalWidth + x1];
+            float h01 = terrain[z1 * originalWidth + x0];
+            float h11 = terrain[z1 * originalWidth + x1];
+
+            float h0 = h00 * (1 - fx) + h10 * fx;
+            float h1 = h01 * (1 - fx) + h11 * fx;
+
+            resizedTerrain[z * width + x] = h0 * (1 - fz) + h1 * fz;
+        }
+    }
+
+    terrain = std::move(resizedTerrain);
+}
+
 void PerlinNoise::GeneratePerlinNoiseWithGradient() {
     const int layerCount = 4; // Number of layers to generate
     const float k = gradientFactor; // Gradient influence parameter
@@ -667,14 +775,19 @@ void PerlinNoise::GeneratePerlinNoiseWithGradient() {
 }
 
 void PerlinNoise::RegeneratePerlinNoise() {
-    GeneratePerlinNoise();
-    GeneratePerlinNoiseWithGradient();
-
-    GeneratePerlinNoiseTerrain(perlinNoise, vertices[0], indices[0]);
-    GeneratePerlinNoiseTerrain(perlinNoiseWithGradient, vertices[1], indices[1]);
+    if (useDLA) {
+        GenerateDLATerrain();
+        GenerateDLATerrainMesh(vertices[0], indices[0]);
+    }
+    else {
+        GeneratePerlinNoise();
+        GeneratePerlinNoiseWithGradient();
+        GeneratePerlinNoiseTerrain(perlinNoise, vertices[0], indices[0]);
+        GeneratePerlinNoiseTerrain(perlinNoiseWithGradient, vertices[1], indices[1]);
+    }
 
     // Update GPU buffers
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < (useDLA ? 1 : 2); ++i) {
         glBindBuffer(GL_ARRAY_BUFFER, vbo[i]);
         glBufferData(GL_ARRAY_BUFFER, vertices[i].size() * sizeof(Vertex), vertices[i].data(), GL_STATIC_DRAW);
 
@@ -682,4 +795,5 @@ void PerlinNoise::RegeneratePerlinNoise() {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices[i].size() * sizeof(unsigned int), indices[i].data(), GL_STATIC_DRAW);
     }
 }
+
 

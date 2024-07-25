@@ -9,6 +9,115 @@
 #include <numeric> 
 #include <thread>
 
+#pragma once
+#include <vector>
+#include <random>
+#include <algorithm>
+#include <glm/glm.hpp>
+
+class DLATerrainGenerator {
+public:
+    DLATerrainGenerator() : m_initialSize(16), m_targetSize(256) {
+        m_rng.seed(std::random_device()());
+    }
+
+    void SetInitialSize(int size) { m_initialSize = size; }
+    void SetTargetSize(int size) { m_targetSize = size; }
+
+    std::vector<float> GenerateTerrain() {
+        std::vector<float> heightMap = GenerateLowResStartingImage();
+
+        while (static_cast<int>(heightMap.size()) < m_targetSize * m_targetSize) {
+            heightMap = UpscaleHeightMap(heightMap);
+        }
+
+        heightMap = FinalBlur(heightMap);
+        NormalizeAndEnhanceContrast(heightMap);
+
+        // Debug output
+        std::cout << "DLA Terrain Generation:" << std::endl;
+        std::cout << "Min Height: " << *std::min_element(heightMap.begin(), heightMap.end()) << std::endl;
+        std::cout << "Max Height: " << *std::max_element(heightMap.begin(), heightMap.end()) << std::endl;
+        std::cout << "Size: " << heightMap.size() << std::endl;
+
+        return heightMap;
+    }
+
+private:
+    int m_initialSize;
+    int m_targetSize;
+    std::mt19937 m_rng;
+
+    std::vector<float> GenerateLowResStartingImage() {
+        std::vector<float> heightMap(m_initialSize * m_initialSize);
+        std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+
+        for (float& height : heightMap) {
+            height = dist(m_rng);
+        }
+
+        return heightMap;
+    }
+
+    std::vector<float> UpscaleHeightMap(const std::vector<float>& input) {
+        int inputSize = static_cast<int>(std::sqrt(input.size()));
+        int outputSize = inputSize * 2;
+        std::vector<float> output(outputSize * outputSize);
+
+        for (int y = 0; y < outputSize; ++y) {
+            for (int x = 0; x < outputSize; ++x) {
+                int inputX = x / 2;
+                int inputY = y / 2;
+                output[y * outputSize + x] = input[inputY * inputSize + inputX];
+            }
+        }
+
+        return output;
+    }
+
+    std::vector<float> FinalBlur(const std::vector<float>& input) {
+        std::vector<float> output = input;
+        int size = static_cast<int>(std::sqrt(input.size()));
+
+        for (int y = 1; y < size - 1; ++y) {
+            for (int x = 1; x < size - 1; ++x) {
+                float sum = 0.0f;
+                for (int dy = -1; dy <= 1; ++dy) {
+                    for (int dx = -1; dx <= 1; ++dx) {
+                        sum += input[(y + dy) * size + (x + dx)];
+                    }
+                }
+                output[y * size + x] = sum / 9.0f;
+            }
+        }
+
+        return output;
+    }
+
+    void NormalizeAndEnhanceContrast(std::vector<float>& heightMap) {
+        float minHeight = *std::min_element(heightMap.begin(), heightMap.end());
+        float maxHeight = *std::max_element(heightMap.begin(), heightMap.end());
+        float range = maxHeight - minHeight;
+
+        if (range < 0.001f) {
+            std::cout << "Warning: Very small height range detected. Adjusting..." << std::endl;
+            for (float& height : heightMap) {
+                height += static_cast<float>(m_rng()) / static_cast<float>(m_rng.max());
+            }
+            minHeight = *std::min_element(heightMap.begin(), heightMap.end());
+            maxHeight = *std::max_element(heightMap.begin(), heightMap.end());
+            range = maxHeight - minHeight;
+        }
+
+        for (float& height : heightMap) {
+            // Normalize
+            height = (height - minHeight) / range;
+
+            // Enhance contrast
+            height = std::pow(height, 1.5f);
+        }
+    }
+};
 
 class PerlinNoise : public Scene_Base
 {
@@ -18,9 +127,9 @@ public:
         m_cameraSpeed(2.5f), m_cameraFront(glm::vec3(0.0f, 0.0f, -1.0f)), m_cameraUp(glm::vec3(0.0f, 1.0f, 0.0f)),
         camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f, (float)GLHelper::width / (float)GLHelper::height, 0.1f, 100.0f),
         outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.20f),
-        gradientFactor(5.03f)
+        gradientFactor(5.03f), useDLA(false), dlaInitialSize(16), dlaTargetSize(256)
     {
-		perlinNoise.resize(outputWidth * outputDepth);
+        perlinNoise.resize(outputWidth * outputDepth);
         perlinNoiseWithGradient.resize(outputWidth * outputDepth);
         InitializePermutationVector();
     }
@@ -146,9 +255,21 @@ private:
     void GeneratePerlinNoiseWithGradient();
     void GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData, std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
     glm::vec2 CalculateGradient(int x, int z, int width, int depth, const std::vector<float>& noise);
+    void GenerateDLATerrain();
+	void GenerateDLATerrainMesh(std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
+	void ResizeTerrain(std::vector<float>& terrain, int width, int depth);
 
     // Regenerate
     void RegeneratePerlinNoise();
+
+
+
+    // DLA Generaor
+    bool useDLA;
+    int dlaInitialSize;
+    int dlaTargetSize;
+    DLATerrainGenerator dlaGenerator;
+    std::vector<float> dlaTerrain;
 
     // Buffer Stuff - for perlin noise plane and the perlin noise + gradient plane
     GLuint vao[2]{}, vbo[2]{}, ebo[2]{};
