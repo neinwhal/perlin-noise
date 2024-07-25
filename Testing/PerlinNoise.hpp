@@ -34,12 +34,14 @@ public:
             // Create a blurry version at the current scale
             std::vector<float> blurryHeightMap = FinalBlur(upscaledHeightMap);
 
+            // Normalize and enhance contrast for blurry version
+            NormalizeAndEnhanceContrast(blurryHeightMap);
+
             // Add details from the crisp version to the blurry version
             AddDetails(blurryHeightMap, upscaledHeightMap);
 
-            // Normalize and enhance contrast for both versions
+            // Normalize and enhance contrast for contrast version
             NormalizeAndEnhanceContrast(upscaledHeightMap);
-            NormalizeAndEnhanceContrast(blurryHeightMap);
 
             // Use the combined version as the new heightMap for the next iteration
             heightMaps.push_back(blurryHeightMap);
@@ -52,7 +54,6 @@ public:
 
         std::vector<float> finalHeightMap = heightMaps.back();
         NormalizeAndEnhanceContrast(finalHeightMap);
-
         // Debug output
         std::cout << "DLA Terrain Generation:" << std::endl;
         std::cout << "Min Height: " << *std::min_element(finalHeightMap.begin(), finalHeightMap.end()) << std::endl;
