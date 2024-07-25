@@ -142,7 +142,8 @@ void PerlinNoise::update(double dt)
 
     ImGui::Begin("Terrain Generation Controls");
 
-    // Add option to switch between Perlin noise and DLA
+    ImGui::Begin("Terrain Generation Controls");
+
     if (ImGui::Checkbox("Use DLA Terrain", &useDLA))
     {
         RegeneratePerlinNoise();
@@ -150,10 +151,16 @@ void PerlinNoise::update(double dt)
 
     if (useDLA)
     {
-        // DLA-specific controls
         bool dlaParamsChanged = false;
-        dlaParamsChanged |= ImGui::SliderInt("Initial Size", &dlaInitialSize, 8, 64);
-        dlaParamsChanged |= ImGui::SliderInt("Target Size", &dlaTargetSize, 128, 1024);
+        dlaParamsChanged |= ImGui::SliderInt("Initial Points", &dlaInitialPoints, 1, 20);
+        dlaParamsChanged |= ImGui::SliderInt("Erosion Iterations", &dlaErosionIterations, 1000, 100000);
+        dlaParamsChanged |= ImGui::SliderFloat("Erosion Strength", &dlaErosionStrength, 0.01f, 1.0f, "%.3f");
+        dlaParamsChanged |= ImGui::SliderInt("Smoothing Passes", &dlaSmoothingPasses, 0, 10);
+
+        dlaParamsChanged |= ImGui::SliderFloat("Height Scale", &dlaHeightScale, 0.1f, 2.0f, "%.2f");
+        dlaParamsChanged |= ImGui::SliderFloat("Height Offset", &dlaHeightOffset, -0.5f, 0.5f, "%.2f");
+        dlaParamsChanged |= ImGui::SliderFloat("Height Power", &dlaHeightPower, 0.1f, 2.0f, "%.2f");
+        dlaParamsChanged |= ImGui::SliderFloat("Height Multiplier", &heightMultiplier, 0.1f, 5.0f, "%.2f");
 
         if (dlaParamsChanged)
         {
@@ -174,47 +181,45 @@ void PerlinNoise::update(double dt)
 
     if (ImGui::Button("Regenerate Terrain"))
     {
-        InitializePermutationVector();
+        if (!useDLA) {
+            InitializePermutationVector();
+        }
         RegeneratePerlinNoise();
     }
 
     ImGui::End();
 
-	// Perlin Noise Visualization window using Imgui
-    ImGui::Begin("Perlin Noise Visualization");
-	// Size of window to display the noise texture
+   // Visualization
+    ImGui::Begin("Terrain Visualization");
     ImVec2 previewSize(400, 400);
-    ImGui::Text("Perlin Noise Preview");
+    ImGui::Text(useDLA ? "DLA Terrain Preview" : "Perlin Noise Preview");
 
-    // Create a texture for the noise
-    static GLuint noiseTextureID = 0;
-    if (noiseTextureID == 0)
+    static GLuint terrainTextureID = 0;
+    if (terrainTextureID == 0)
     {
-        glGenTextures(1, &noiseTextureID);
-        glBindTexture(GL_TEXTURE_2D, noiseTextureID);
+        glGenTextures(1, &terrainTextureID);
+        glBindTexture(GL_TEXTURE_2D, terrainTextureID);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    // Update the texture with the current Perlin noise data
-    std::vector<unsigned char> noiseData(outputWidth * outputDepth * 4); 
+    std::vector<unsigned char> terrainData(outputWidth * outputDepth * 4);
+    const std::vector<float>& sourceData = useDLA ? dlaTerrain : perlinNoise;
     for (int i = 0; i < outputWidth * outputDepth; ++i)
     {
-        unsigned char value = static_cast<unsigned char>(perlinNoise[i] * 255.0f);
-        noiseData[i * 4 + 0] = value; // R
-        noiseData[i * 4 + 1] = value; // G
-        noiseData[i * 4 + 2] = value; // B
-        noiseData[i * 4 + 3] = 255;   // A (fully opaque)
+        unsigned char value = static_cast<unsigned char>(sourceData[i] * 255.0f);
+        terrainData[i * 4 + 0] = value; // R
+        terrainData[i * 4 + 1] = value; // G
+        terrainData[i * 4 + 2] = value; // B
+        terrainData[i * 4 + 3] = 255;   // A (fully opaque)
     }
 
-    glBindTexture(GL_TEXTURE_2D, noiseTextureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, outputWidth, outputDepth, 0, GL_RGBA, GL_UNSIGNED_BYTE, noiseData.data());
+    glBindTexture(GL_TEXTURE_2D, terrainTextureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, outputWidth, outputDepth, 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData.data());
 
-    // Display the noise texture
-    ImGui::Image((void*)(intptr_t)noiseTextureID, previewSize);
-
+    ImGui::Image((void*)(intptr_t)terrainTextureID, previewSize);
     ImGui::End();
 
 
@@ -611,11 +616,9 @@ glm::vec2 PerlinNoise::CalculateGradient(int x, int z, int width, int depth, con
 
 // New method to generate DLA terrain
 void PerlinNoise::GenerateDLATerrain() {
-    dlaGenerator.SetInitialSize(dlaInitialSize);
-    dlaGenerator.SetTargetSize(dlaTargetSize);
+    dlaGenerator.SetOutputSize(outputWidth, outputDepth);
     dlaTerrain = dlaGenerator.GenerateTerrain();
 
-    // Resize dlaTerrain if necessary
     if (dlaTerrain.size() != outputWidth * outputDepth) {
         ResizeTerrain(dlaTerrain, outputWidth, outputDepth);
     }
@@ -639,12 +642,18 @@ void PerlinNoise::GenerateDLATerrainMesh(std::vector<Vertex>& outVertices, std::
             float height = dlaTerrain[z * outputWidth + x];
             float normalizedHeight = (height - minHeight) / heightRange;
 
+            // Apply height adjustments
+            normalizedHeight = std::pow(normalizedHeight, dlaHeightPower);
+            normalizedHeight = normalizedHeight * dlaHeightScale + dlaHeightOffset;
+            normalizedHeight = std::max(0.0f, std::min(1.0f, normalizedHeight));  // Clamp to [0, 1]
+
             glm::vec3 position(
                 x / static_cast<float>(outputWidth - 1) - 0.5f,
                 normalizedHeight * heightMultiplier,
                 z / static_cast<float>(outputDepth - 1) - 0.5f
             );
-            // More pronounced color gradient based on height
+
+            // Color calculation (you can adjust this as needed)
             glm::vec3 color;
             if (normalizedHeight < 0.2f) {
                 color = glm::vec3(0.0f, 0.0f, 0.5f); // Deep blue for water
@@ -665,7 +674,6 @@ void PerlinNoise::GenerateDLATerrainMesh(std::vector<Vertex>& outVertices, std::
             outVertices.push_back({ position, color });
         }
     }
-
     // Generate indices (same as before)
     for (int z = 0; z < outputDepth - 1; z++) {
         for (int x = 0; x < outputWidth - 1; x++) {
@@ -677,7 +685,6 @@ void PerlinNoise::GenerateDLATerrainMesh(std::vector<Vertex>& outVertices, std::
             outIndices.push_back(topLeft);
             outIndices.push_back(bottomLeft);
             outIndices.push_back(topRight);
-
             outIndices.push_back(topRight);
             outIndices.push_back(bottomLeft);
             outIndices.push_back(bottomRight);
@@ -776,7 +783,12 @@ void PerlinNoise::GeneratePerlinNoiseWithGradient() {
 
 void PerlinNoise::RegeneratePerlinNoise() {
     if (useDLA) {
-        GenerateDLATerrain();
+        dlaGenerator.SetOutputSize(outputWidth, outputDepth);
+        dlaGenerator.SetInitialPoints(dlaInitialPoints);
+        dlaGenerator.SetErosionIterations(dlaErosionIterations);
+        dlaGenerator.SetErosionStrength(dlaErosionStrength);
+        dlaGenerator.SetSmoothingPasses(dlaSmoothingPasses);
+        dlaTerrain = dlaGenerator.GenerateTerrain();
         GenerateDLATerrainMesh(vertices[0], indices[0]);
     }
     else {

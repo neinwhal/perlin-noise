@@ -15,142 +15,262 @@
 #include <algorithm>
 #include <glm/glm.hpp>
 
-class DLATerrainGenerator {
+#include <vector>
+#include <random>
+#include <cmath>
+#include <algorithm>
+#include <iostream>
+
+class ImprovedDLATerrainGenerator {
 public:
-    DLATerrainGenerator() : m_initialSize(16), m_targetSize(256) {
-        m_rng.seed(std::random_device()());
+    ImprovedDLATerrainGenerator(int seed = 134137)
+        : m_rng(seed), m_seed(seed), m_initialPoints(5), m_erosionIterations(50000),
+        m_erosionStrength(0.1f), m_smoothingPasses(2) {}
+
+    void SetOutputSize(int width, int height) {
+        m_outputWidth = width;
+        m_outputHeight = height;
     }
 
-    void SetInitialSize(int size) { m_initialSize = size; }
-    void SetTargetSize(int size) { m_targetSize = size; }
+    void SetInitialPoints(int points) { m_initialPoints = points; }
+    void SetErosionIterations(int iterations) { m_erosionIterations = iterations; }
+    void SetErosionStrength(float strength) { m_erosionStrength = strength; }
+    void SetSmoothingPasses(int passes) { m_smoothingPasses = passes; }
 
     std::vector<float> GenerateTerrain() {
-        std::vector<std::vector<float>> heightMaps;
-        heightMaps.push_back(GenerateLowResStartingImage());
-
-        while (static_cast<int>(std::sqrt(heightMaps.back().size())) < m_targetSize) {
-            std::vector<float> upscaledHeightMap = UpscaleHeightMap(heightMaps.back());
-
-            // Create a blurry version at the current scale
-            std::vector<float> blurryHeightMap = FinalBlur(upscaledHeightMap);
-
-            // Normalize and enhance contrast for blurry version
-            NormalizeAndEnhanceContrast(blurryHeightMap);
-
-            // Add details from the crisp version to the blurry version
-            AddDetails(blurryHeightMap, upscaledHeightMap);
-
-            // Normalize and enhance contrast for contrast version
-            NormalizeAndEnhanceContrast(upscaledHeightMap);
-
-            // Use the combined version as the new heightMap for the next iteration
-            heightMaps.push_back(blurryHeightMap);
-        }
-
-        // Apply the formula to each height map
-        for (auto& heightMap : heightMaps) {
-            ApplyFormula(heightMap);
-        }
-
-        std::vector<float> finalHeightMap = heightMaps.back();
-        NormalizeAndEnhanceContrast(finalHeightMap);
-        // Debug output
-        std::cout << "DLA Terrain Generation:" << std::endl;
-        std::cout << "Min Height: " << *std::min_element(finalHeightMap.begin(), finalHeightMap.end()) << std::endl;
-        std::cout << "Max Height: " << *std::max_element(finalHeightMap.begin(), finalHeightMap.end()) << std::endl;
-        std::cout << "Size: " << std::sqrt(finalHeightMap.size()) << "x" << std::sqrt(finalHeightMap.size()) << std::endl;
-
-        return finalHeightMap;
+        std::vector<float> terrain = PerformDLA();
+        ApplyErosion(terrain);
+        SmoothTerrain(terrain);
+        NormalizeTerrain(terrain);
+        return terrain;
     }
 
 private:
-    int m_initialSize;
-    int m_targetSize;
     std::mt19937 m_rng;
+    int m_seed;
+    int m_outputWidth = 128;
+    int m_outputHeight = 128;
+    int m_initialPoints;
+    int m_erosionIterations;
+    float m_erosionStrength;
+    int m_smoothingPasses;
 
-    std::vector<float> GenerateLowResStartingImage() {
-        std::vector<float> heightMap(m_initialSize * m_initialSize);
-        std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+    std::vector<float> PerformDLA() {
+        std::vector<float> terrain(m_outputWidth * m_outputHeight, 0.0f);
+        std::vector<std::pair<int, int>> points;
 
-        for (float& height : heightMap) {
-            height = dist(m_rng);
+        for (int i = 0; i < m_initialPoints; ++i) {
+            int x = m_rng() % m_outputWidth;
+            int y = m_rng() % m_outputHeight;
+            points.emplace_back(x, y);
+            terrain[y * m_outputWidth + x] = 1.0f;
         }
 
-        return heightMap;
+        int maxPoints = m_outputWidth * m_outputHeight / 100; 
+        while (points.size() < maxPoints) {
+            std::pair<int, int> newPoint = GeneratePerimeterPoint();
+            WalkPointUntilStick(newPoint, terrain, points);
+        }
+
+        return terrain;
     }
 
-    std::vector<float> UpscaleHeightMap(const std::vector<float>& input) {
-        int inputSize = static_cast<int>(std::sqrt(input.size()));
-        int outputSize = inputSize * 2;
-        std::vector<float> output(outputSize * outputSize);
+    std::pair<int, int> GeneratePerimeterPoint() {
+        std::uniform_int_distribution<> distSide(0, 3);
+        std::uniform_int_distribution<> distPos(0, m_outputWidth - 1);
 
-        for (int y = 0; y < outputSize; ++y) {
-            for (int x = 0; x < outputSize; ++x) {
-                int inputX = x / 2;
-                int inputY = y / 2;
-                output[y * outputSize + x] = input[inputY * inputSize + inputX];
+        int side = distSide(m_rng);
+        switch (side) {
+        case 0: return { 0, distPos(m_rng) }; // Left
+        case 1: return { m_outputWidth - 1, distPos(m_rng) }; // Right
+        case 2: return { distPos(m_rng), 0 }; // Top
+        case 3: return { distPos(m_rng), m_outputHeight - 1 }; // Bottom
+        }
+        return { 0, 0 }; // Should never reach here la hor
+    }
+
+    void WalkPointUntilStick(std::pair<int, int>& point, std::vector<float>& terrain, std::vector<std::pair<int, int>>& points) {
+        std::uniform_int_distribution<> distDir(-1, 1);
+
+        while (true) {
+            // Check if the point is adjacent to an existing point
+            if (IsAdjacentToExistingPoint(point, terrain)) {
+                terrain[point.first + point.second * m_outputWidth] = 1.0f;
+                points.push_back(point);
+                break;
             }
-        }
 
-        return output;
+            // Move the point
+            point.first = std::clamp(point.first + distDir(m_rng), 0, m_outputWidth - 1);
+            point.second = std::clamp(point.second + distDir(m_rng), 0, m_outputHeight - 1);
+        }
     }
 
-    std::vector<float> FinalBlur(const std::vector<float>& input) {
-        std::vector<float> output = input;
-        int size = static_cast<int>(std::sqrt(input.size()));
-
-        for (int y = 1; y < size - 1; ++y) {
-            for (int x = 1; x < size - 1; ++x) {
-                float sum = 0.0f;
-                for (int dy = -1; dy <= 1; ++dy) {
-                    for (int dx = -1; dx <= 1; ++dx) {
-                        sum += input[(y + dy) * size + (x + dx)];
+    bool IsAdjacentToExistingPoint(const std::pair<int, int>& point, const std::vector<float>& terrain) {
+        for (int dy = -1; dy <= 1; ++dy) {
+            for (int dx = -1; dx <= 1; ++dx) {
+                int nx = point.first + dx;
+                int ny = point.second + dy;
+                if (nx >= 0 && nx < m_outputWidth && ny >= 0 && ny < m_outputHeight) {
+                    if (terrain[nx + ny * m_outputWidth] > 0) {
+                        return true;
                     }
                 }
-                output[y * size + x] = sum / 9.0f;
+            }
+        }
+        return false;
+    }
+
+    void ApplyMultipleBlurPasses(std::vector<float>& terrain) {
+        std::vector<int> blurRadii = { 32, 16, 8, 4, 2, 1 };
+        std::vector<float> blurWeights = { 0.01f, 0.04f, 0.08f, 0.16f, 0.32f, 0.39f };
+
+        std::vector<float> result(terrain.size(), 0.0f);
+
+        for (size_t i = 0; i < blurRadii.size(); ++i) {
+            std::vector<float> blurred = ApplyBoxBlur(terrain, blurRadii[i]);
+            for (size_t j = 0; j < result.size(); ++j) {
+                result[j] += blurred[j] * blurWeights[i];
+            }
+        }
+
+        terrain = result;
+    }
+
+    std::vector<float> ApplyBoxBlur(const std::vector<float>& input, int radius) {
+        std::vector<float> output = input;
+        std::vector<float> temp(input.size());
+
+        // Horizontal pass
+        for (int y = 0; y < m_outputHeight; ++y) {
+            float sum = 0.0f;
+            for (int x = 0; x < radius; ++x) {
+                sum += input[x + y * m_outputWidth];
+            }
+            for (int x = 0; x < m_outputWidth; ++x) {
+                if (x > radius) sum -= input[(x - radius - 1) + y * m_outputWidth];
+                if (x < m_outputWidth - radius) sum += input[(x + radius) + y * m_outputWidth];
+                temp[x + y * m_outputWidth] = sum / (2 * radius + 1);
+            }
+        }
+
+        // Vertical pass
+        for (int x = 0; x < m_outputWidth; ++x) {
+            float sum = 0.0f;
+            for (int y = 0; y < radius; ++y) {
+                sum += temp[x + y * m_outputWidth];
+            }
+            for (int y = 0; y < m_outputHeight; ++y) {
+                if (y > radius) sum -= temp[x + (y - radius - 1) * m_outputWidth];
+                if (y < m_outputHeight - radius) sum += temp[x + (y + radius) * m_outputWidth];
+                output[x + y * m_outputWidth] = sum / (2 * radius + 1);
             }
         }
 
         return output;
     }
 
-    void NormalizeAndEnhanceContrast(std::vector<float>& heightMap) {
-        float minHeight = *std::min_element(heightMap.begin(), heightMap.end());
-        float maxHeight = *std::max_element(heightMap.begin(), heightMap.end());
+    void AddPerlinNoise(std::vector<float>& terrain) {
+        // TODO: Implement Perlin noise generation here
+        for (int y = 0; y < m_outputHeight; ++y) {
+            for (int x = 0; x < m_outputWidth; ++x) {
+                float noise = GenerateSimpleNoise(x, y);
+                terrain[x + y * m_outputWidth] += noise * 0.1f; 
+            }
+        }
+    }
+
+    float GenerateSimpleNoise(int x, int y) {
+        x = (x << 13) ^ y;
+        return (1.0f - ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f);
+    }
+
+    void ApplyErosion(std::vector<float>& terrain) {
+        for (int i = 0; i < m_erosionIterations; ++i) {
+            ErosionDroplet(terrain);
+        }
+    }
+
+    void ErosionDroplet(std::vector<float>& terrain) {
+        std::uniform_int_distribution<> distX(0, m_outputWidth - 1);
+        std::uniform_int_distribution<> distY(0, m_outputHeight - 1);
+        std::uniform_real_distribution<float> distFloat(0.0f, 1.0f);
+
+        int x = distX(m_rng);
+        int y = distY(m_rng);
+        float sediment = 0.0f;
+
+        for (int step = 0; step < 100; ++step) {
+            int index = x + y * m_outputWidth;
+            float height = terrain[index];
+
+            // Find the steepest downhill direction
+            int newX = x, newY = y;
+            float maxDiff = 0.0f;
+
+            for (int dy = -1; dy <= 1; ++dy) {
+                for (int dx = -1; dx <= 1; ++dx) {
+                    if (dx == 0 && dy == 0) continue;
+                    int nx = x + dx;
+                    int ny = y + dy;
+                    if (nx < 0 || nx >= m_outputWidth || ny < 0 || ny >= m_outputHeight) continue;
+
+                    float diff = height - terrain[nx + ny * m_outputWidth];
+                    if (diff > maxDiff) {
+                        maxDiff = diff;
+                        newX = nx;
+                        newY = ny;
+                    }
+                }
+            }
+
+            if (maxDiff == 0.0f) break; // No downhill path
+
+            // Erode and deposit
+            float erosionFactor = 0.1f;
+            float depositFactor = 0.1f;
+
+            float erosionAmount = std::min(maxDiff, erosionFactor * (1.0f + sediment));
+            terrain[index] -= erosionAmount;
+            sediment += erosionAmount;
+
+            float depositAmount = std::min(sediment, depositFactor);
+            terrain[newX + newY * m_outputWidth] += depositAmount;
+            sediment -= depositAmount;
+
+            x = newX;
+            y = newY;
+        }
+    }
+
+    void SmoothTerrain(std::vector<float>& terrain) {
+        std::vector<float> temp(terrain.size());
+        for (int pass = 0; pass < m_smoothingPasses; ++pass) {
+            for (int y = 1; y < m_outputHeight - 1; ++y) {
+                for (int x = 1; x < m_outputWidth - 1; ++x) {
+                    float sum = 0.0f;
+                    for (int dy = -1; dy <= 1; ++dy) {
+                        for (int dx = -1; dx <= 1; ++dx) {
+                            sum += terrain[(y + dy) * m_outputWidth + (x + dx)];
+                        }
+                    }
+                    temp[y * m_outputWidth + x] = sum / 9.0f;
+                }
+            }
+            std::swap(terrain, temp);
+        }
+    }
+
+    void NormalizeTerrain(std::vector<float>& terrain) {
+        float minHeight = *std::min_element(terrain.begin(), terrain.end());
+        float maxHeight = *std::max_element(terrain.begin(), terrain.end());
         float range = maxHeight - minHeight;
 
-        if (range < 0.001f) {
-            std::cout << "Warning: Very small height range detected. Adjusting..." << std::endl;
-            for (float& height : heightMap) {
-                height += static_cast<float>(m_rng()) / static_cast<float>(m_rng.max());
-            }
-            minHeight = *std::min_element(heightMap.begin(), heightMap.end());
-            maxHeight = *std::max_element(heightMap.begin(), heightMap.end());
-            range = maxHeight - minHeight;
-        }
-
-        for (float& height : heightMap) {
-            // Normalize
+        for (float& height : terrain) {
             height = (height - minHeight) / range;
-
-            // Enhance contrast
-            height = std::pow(height, 1.5f);
-        }
-    }
-
-    void AddDetails(std::vector<float>& blurry, const std::vector<float>& crisp) {
-        for (size_t i = 0; i < blurry.size(); ++i) {
-            blurry[i] += (crisp[i] - blurry[i]) * 0.5f; // Adjust the factor to control the amount of detail added
-        }
-    }
-
-    void ApplyFormula(std::vector<float>& heightMap) {
-        for (float& height : heightMap) {
-            height = 1 - 1 / (1 + height);
         }
     }
 };
-
 class PerlinNoise : public Scene_Base
 {
 public:
@@ -158,8 +278,16 @@ public:
         : _sceneManager(sceneManager), _name(name), elapsedTime(0.0f),
         m_cameraSpeed(2.5f), m_cameraFront(glm::vec3(0.0f, 0.0f, -1.0f)), m_cameraUp(glm::vec3(0.0f, 1.0f, 0.0f)),
         camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f, (float)GLHelper::width / (float)GLHelper::height, 0.1f, 100.0f),
-        outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.20f),
-        gradientFactor(5.03f), useDLA(false), dlaInitialSize(16), dlaTargetSize(256)
+        outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.07f),
+        gradientFactor(5.03f), useDLA(false),
+        dlaInitialPoints(1),
+        dlaErosionIterations(1),
+        dlaErosionStrength(0.1f),
+        dlaSmoothingPasses(2),
+        dlaGenerator(134137),
+        dlaHeightScale(1.0f),
+        dlaHeightOffset(0.0f),
+        dlaHeightPower(1.0f)
     {
         perlinNoise.resize(outputWidth * outputDepth);
         perlinNoiseWithGradient.resize(outputWidth * outputDepth);
@@ -300,8 +428,15 @@ private:
     bool useDLA;
     int dlaInitialSize;
     int dlaTargetSize;
-    DLATerrainGenerator dlaGenerator;
+    ImprovedDLATerrainGenerator dlaGenerator;
     std::vector<float> dlaTerrain;
+    int dlaInitialPoints;
+    int dlaErosionIterations;
+    float dlaErosionStrength;
+    int dlaSmoothingPasses;
+    float dlaHeightScale;
+    float dlaHeightOffset;
+    float dlaHeightPower;
 
     // Buffer Stuff - for perlin noise plane and the perlin noise + gradient plane
     GLuint vao[2]{}, vbo[2]{}, ebo[2]{};
