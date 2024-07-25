@@ -174,6 +174,7 @@ void PerlinNoise::update(double dt)
 
     if (ImGui::Button("Regenerate Terrain"))
     {
+        InitializePermutationVector();
         RegeneratePerlinNoise();
     }
 
@@ -629,7 +630,6 @@ void PerlinNoise::GenerateDLATerrainMesh(std::vector<Vertex>& outVertices, std::
     float maxHeight = *std::max_element(dlaTerrain.begin(), dlaTerrain.end());
     float heightRange = maxHeight - minHeight;
 
-    // Ensure we have a non-zero height range
     if (heightRange < 0.001f) {
         heightRange = 1.0f;
     }
