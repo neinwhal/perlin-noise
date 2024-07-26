@@ -1,12 +1,14 @@
 #include <glhelper.h>
 #include <../Input.h>
+
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/noise.hpp>
+
 #include <../KeyCodes.h>
 #include "../imgui-1.87/imgui-1.87/imgui.h"
 #include "../imgui-1.87/imgui-1.87/backends/imgui_impl_glfw.h"
 #include "../imgui-1.87/imgui-1.87/backends/imgui_impl_opengl3.h"
 #include "../PerlinNoise.hpp"
-#include <glm/gtc/noise.hpp>
 
 void PerlinNoise::load()
 {

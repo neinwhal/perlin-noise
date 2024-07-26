@@ -18,11 +18,7 @@ an OpenGL context and implement a game loop.
 #include <glapp.h>
 #include <iostream>
 #include <memory>
-#include "../Assignment1.h"
-#include "../Assignment2.h"
 #include "../PerlinNoise.hpp"
-
-
 
 /*                                                   type declarations
 ----------------------------------------------------------------------------- */

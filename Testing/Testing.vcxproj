@@ -162,12 +162,8 @@ copy "$(SolutionDir)lib\assimp\bin\Release\assimp-vc143-mt.dll" "$(TargetDir)ass
     <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_draw.cpp" />
     <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_tables.cpp" />
     <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_widgets.cpp" />
-    <ClCompile Include="Assignment2.cpp" />
     <ClCompile Include="Input.cpp" />
-    <ClCompile Include="IntersectionTest.cpp" />
     <ClCompile Include="PerlinNoise.cpp" />
-    <ClCompile Include="Primitives.cpp" />
-    <ClCompile Include="src\Assignment1.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
     <ClCompile Include="src\glslshader.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -180,17 +176,13 @@ copy "$(SolutionDir)lib\assimp\bin\Release\assimp-vc143-mt.dll" "$(TargetDir)ass
     <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_rectpack.h" />
     <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_textedit.h" />
     <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_truetype.h" />
-    <ClInclude Include="Assignment1.h" />
-    <ClInclude Include="Assignment2.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="include\glapp.h" />
     <ClInclude Include="include\glhelper.h" />
     <ClInclude Include="include\glslshader.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="IntersectionTest.h" />
     <ClInclude Include="KeyCodes.h" />
     <ClInclude Include="PerlinNoise.hpp" />
-    <ClInclude Include="Primitives.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

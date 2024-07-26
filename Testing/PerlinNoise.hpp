@@ -1,8 +1,6 @@
 #pragma once
 #include "glapp.h"
 #include "./Camera.h"
-#include "./Primitives.h"
-#include "./IntersectionTest.h"
 #include <vector>
 #include <random>
 #include <algorithm>
