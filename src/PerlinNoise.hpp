@@ -1,6 +1,5 @@
 #pragma once
 #include "glapp.h"
-#include "./Camera.h"
 #include <vector>
 #include <random>
 #include <algorithm>
@@ -274,8 +273,6 @@ class PerlinNoise : public Scene_Base
 public:
     PerlinNoise(Scene_Manager& sceneManager, const std::string& name)
         : _sceneManager(sceneManager), _name(name), elapsedTime(0.0f),
-        m_cameraSpeed(2.5f), m_cameraFront(glm::vec3(0.0f, 0.0f, -1.0f)), m_cameraUp(glm::vec3(0.0f, 1.0f, 0.0f)),
-        camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 45.0f, (float)GLHelper::width / (float)GLHelper::height, 0.1f, 100.0f),
         visualization_primitive(0), light_position(glm::vec3(5.f, 5.f, 5.f)),
         outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.07f),
         gradientFactor(5.03f), useDLA(false),
@@ -322,12 +319,6 @@ private:
     // Lighting
     int visualization_primitive;
     glm::vec3 light_position;
-
-    // Camera
-    Camera camera;
-    float m_cameraSpeed;
-    glm::vec3 m_cameraFront;
-    glm::vec3 m_cameraUp;
 
     // Perlin Noise Stuff
     int outputWidth, outputDepth;

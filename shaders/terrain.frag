@@ -9,6 +9,7 @@ uniform bool uApplyLighting;
 
 void main() {
     if (uApplyLighting) {
+        // apply diffuse lighting
         vec3 normal = normalize(cross(dFdx(FragPos), dFdy(FragPos)));
         vec3 lightDir = normalize(uLightPos - FragPos);
         float diff = max(dot(normal, lightDir), 0.0);
@@ -20,6 +21,7 @@ void main() {
         vec3 specular = 0.2 * spec * vec3(1.0, 1.0, 1.0);
         fFragColor = vec4(ambient + diffuse + specular, 1.0);
     } else {
+        // no lighting, apply raw color
         fFragColor = vec4(Color, 1.0);
     }
 }

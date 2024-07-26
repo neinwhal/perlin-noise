@@ -188,7 +188,7 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_rectpack.h" />
     <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_truetype.h" />
-    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\camera.hpp" />
     <ClInclude Include="src\glapp.h" />
     <ClInclude Include="src\glhelper.h" />
     <ClInclude Include="src\Input.h" />

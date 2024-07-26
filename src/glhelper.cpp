@@ -14,8 +14,9 @@ pointers to OpenGL implementations.
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
 #include "glhelper.h"
+#include "camera.hpp"
 
-
+#include <imgui/imgui.h>
 
 /*                                                   objects with file scope
 ----------------------------------------------------------------------------- */
@@ -160,51 +161,39 @@ bool GLHelper::init(GLint w, GLint h, std::string t) {
 
   //glfwSetCursorPosCallback(GLHelper::ptr_window, GLHelper::mousepos_cb);
   glfwSetScrollCallback(GLHelper::ptr_window, [](GLFWwindow* window, double xOffset, double yOffset) {
-      static_cast<void>(window);
+      /*static_cast<void>(window);
       static_cast<void>(xOffset);
       fov -= (float)yOffset;
       if (fov < 1.0f)
           fov = 1.0f;
       if (fov > 45.0f)
           fov = 45.0f;
-      });
+      */
+
+      if (!ImGui::GetIO().WantCaptureMouse) {
+          main_camera.on_scroll(static_cast<float>(xOffset), static_cast<float>(yOffset));
+      }
+  });
 
   glfwSetCursorPosCallback(GLHelper::ptr_window, [](GLFWwindow* window, double xPos, double yPos) {
       static_cast<void>(window);
       static_cast<float>(xPos);
       static_cast<float>(yPos);
+
       if (rightMouseButtonPressed) {
           if (firstMouse) {
               lastX = static_cast<float>(xPos);
               lastY = static_cast<float>(yPos);
               firstMouse = false;
           }
+          else {
+              main_camera.on_cursor(static_cast<float>(xPos - lastX), static_cast<float>(yPos - lastY));
+              lastX = static_cast<float>(xPos);
+              lastY = static_cast<float>(yPos);
 
-          float xoffset = static_cast<float>(xPos) - lastX;
-          float yoffset = lastY - static_cast<float>(yPos); // Reversed since y-coordinates go from bottom to top
-          lastX = static_cast<float>(xPos);
-          lastY = static_cast<float>(yPos);
-
-          float sensitivity = 0.1f;
-          xoffset *= sensitivity;
-          yoffset *= sensitivity;
-
-          yaw += xoffset;
-          pitch += yoffset;
-
-          // Clamp pitch to prevent flipping
-          if (pitch > 89.0f)
-              pitch = 89.0f;
-          if (pitch < -89.0f)
-              pitch = -89.0f;
-
-          // Update camera front vector
-          glm::vec3 front;
-          front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-          front.y = sin(glm::radians(pitch));
-          front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-          cameraFront = glm::normalize(front);
+          }
       }
+
       });
 
 

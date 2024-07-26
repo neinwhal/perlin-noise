@@ -78,9 +78,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Camera.h">
-      <Filter>Source Files\Graphics\Camera</Filter>
-    </ClInclude>
     <ClInclude Include="src\Input.h">
       <Filter>Source Files\Graphics\Input</Filter>
     </ClInclude>
@@ -125,6 +122,9 @@
     </ClInclude>
     <ClInclude Include="lib\imgui-1.90.8\imgui\imgui.h">
       <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\camera.hpp">
+      <Filter>Source Files\Graphics\Camera</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

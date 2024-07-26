@@ -5,6 +5,8 @@
 #include <imgui/imgui_impl_glfw.h>
 #include <imgui/imgui_impl_opengl3.h>
 
+#include "camera.hpp"
+
 void PerlinNoise::gui() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -17,15 +19,20 @@ void PerlinNoise::gui() {
 
 void PerlinNoise::gui_settings() {
     ImGui::Begin("Scene Settings");
-    const char* visual_text[5] = { "Planes", "Lines", "Points" };
+    const char* visual_text[3] = { "Planes", "Lines", "Points" };
     ImGui::Combo("Visualization", &visualization_primitive, visual_text, 3);
 
     ImGui::DragFloat3("Light Position", &light_position[0], 0.01f);
     ImGui::Separator();
 
+    ImGui::DragFloat("Cam Move Speed", &main_camera.get_move_speed(), 0.01f);
+    ImGui::DragFloat("Cam Turn Speed", &main_camera.get_turn_speed(), 0.01f);
+    ImGui::DragFloat("Cam Turn Sensitivity", &main_camera.get_sensitivity(), 0.001f);
+    ImGui::Checkbox("Inverse Turn", &main_camera.get_inverse());
+    ImGui::Checkbox("Flight Mode", &main_camera.get_flight());
+
     ImGui::End();
 }
-
 
 // Terrain Generation Controls
 void PerlinNoise::gui_terrain_gen_controls() {

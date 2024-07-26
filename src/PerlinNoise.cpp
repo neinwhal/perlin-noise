@@ -8,14 +8,20 @@
 #include <imgui/imgui_impl_opengl3.h>
 #include "PerlinNoise.hpp"
 
-void PerlinNoise::load()
-{
+#include "camera.hpp"
+constexpr glm::vec3 cam_start_pos{ 0.0f, 1.0f, 10.0f };
+camera main_camera(
+    camera_type::persp,
+    cam_start_pos
+);
+
+
+void PerlinNoise::load() {
     add_shader_programs("terrain", "shaders/terrain.vert", "shaders/terrain.frag");
 }
 
 
-void PerlinNoise::init()
-{
+void PerlinNoise::init() {
     GeneratePerlinNoise();
     GeneratePerlinNoiseWithGradient();
 
@@ -32,8 +38,7 @@ void PerlinNoise::init()
     glGenBuffers(2, vbo);
     glGenBuffers(2, ebo);
 
-    for (int i = 0; i < 2; ++i)
-    {
+    for (int i = 0; i < 2; ++i) {
         glBindVertexArray(vao[i]);
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo[i]);
@@ -55,12 +60,9 @@ void PerlinNoise::init()
 }
 
 
-void PerlinNoise::update(double dt)
-{
+void PerlinNoise::update(double dt) {
     elapsedTime += dt;
     glViewport(0, 0, GLHelper::width, GLHelper::height);
-    float aspectRatio = (float)GLHelper::width / GLHelper::height;
-    camera.setAspectRatio(aspectRatio);
 
     // handle movement controls
     control(dt);
@@ -90,32 +92,34 @@ void PerlinNoise::update(double dt)
 	draw();
 }
 
-void PerlinNoise::draw()
-{
+void PerlinNoise::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
     shdrpgms["terrain"].use();
 
-    // Set up camera
-    camera.setTarget(camera.getPosition() + GLHelper::cameraFront);
-    camera.setFOV(GLHelper::fov);
-
-    // Set up model, view, projection matrices
-    glm::mat4 projection = camera.getProjectionMatrix();
-    glm::mat4 view = camera.getViewMatrix();
-
     // Set uniforms
     GLuint uniform_uLightPos = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "uLightPos");
     glUniform3f(uniform_uLightPos, light_position.x, light_position.y, light_position.z);
-    GLuint uniform_uViewPos = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "uViewPos");
-    glUniform3f(uniform_uViewPos, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
     // Draw terrain
-    glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 mvp = projection * view * model;
+    glm::mat4 M = glm::mat4(1.0f);
+    glm::mat4 VP = main_camera.get_look_at();
+    glm::mat4 PP = main_camera.get_projection(static_cast<float>(GLHelper::width) / static_cast<float>(GLHelper::height));
+
+   
+
+
+    //glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 MV = VP * M;
+    glm::mat4 mvp = PP * MV;
+
+
     GLuint uniform_mvpMatrix = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "mvpMatrix");
     glUniformMatrix4fv(uniform_mvpMatrix, 1, GL_FALSE, glm::value_ptr(mvp));
+    GLuint uniform_uViewPos = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "uViewPos");
+    glUniform3f(uniform_uViewPos, main_camera.get_position().x, main_camera.get_position().y, main_camera.get_position().z);
+
 
     if (useDLA) {
         glBindVertexArray(vao[0]);
@@ -124,11 +128,12 @@ void PerlinNoise::draw()
     else {
         // Draw both Perlin noise terrains
         for (int i = 0; i < 2; ++i) {
-            model = glm::mat4(1.0f);
+            M = glm::mat4(1.0f);
             if (i == 1) {
-                model = glm::translate(model, glm::vec3(1.5f, 0.0f, 0.0f));
+                M = glm::translate(M, glm::vec3(1.5f, 0.0f, 0.0f));
             }
-            mvp = projection * view * model;
+            MV = VP * M;
+            mvp = PP * MV;
             glUniformMatrix4fv(uniform_mvpMatrix, 1, GL_FALSE, glm::value_ptr(mvp));
 
             glBindVertexArray(vao[i]);
@@ -143,8 +148,7 @@ void PerlinNoise::draw()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void PerlinNoise::cleanup()
-{
+void PerlinNoise::cleanup() {
     glDeleteVertexArrays(2, vao);
     glDeleteBuffers(2, vbo);
     glDeleteBuffers(2, ebo);
@@ -155,8 +159,7 @@ void PerlinNoise::cleanup()
 }
 
 
-void PerlinNoise::GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData, std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices)
-{
+void PerlinNoise::GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData, std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices) {
     outVertices.clear();
     outIndices.clear();
 
