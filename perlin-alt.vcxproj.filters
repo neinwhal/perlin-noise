@@ -46,27 +46,6 @@
     <ClCompile Include="src\PerlinNoise.cpp">
       <Filter>Source Files\Perlin</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_glfw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_tables.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="src\shader.cpp">
       <Filter>Source Files\Graphics\Shader</Filter>
     </ClCompile>
@@ -75,6 +54,27 @@
     </ClCompile>
     <ClCompile Include="src\PerlinControl.cpp">
       <Filter>Source Files\Perlin</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_impl_glfw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_impl_opengl3.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,35 +96,35 @@
     <ClInclude Include="src\PerlinNoise.hpp">
       <Filter>Source Files\Perlin</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_glfw.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3_loader.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_internal.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_rectpack.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_textedit.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_truetype.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imconfig.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="src\shader.hpp">
       <Filter>Source Files\Graphics\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui_impl_glfw.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui_impl_opengl3.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_rectpack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_truetype.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imconfig.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui.h">
+      <Filter>ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

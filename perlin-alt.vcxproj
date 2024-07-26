@@ -163,13 +163,13 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_tables.cpp" />
-    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui.cpp" />
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_demo.cpp" />
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_draw.cpp" />
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_tables.cpp" />
+    <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -179,15 +179,15 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imconfig.h" />
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui.h" />
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_glfw.h" />
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3.h" />
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_internal.h" />
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_rectpack.h" />
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_textedit.h" />
-    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_truetype.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imconfig.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imgui_internal.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_rectpack.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_textedit.h" />
+    <ClInclude Include="lib\imgui-1.90.8\imgui\imstb_truetype.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\glapp.h" />
     <ClInclude Include="src\glhelper.h" />
