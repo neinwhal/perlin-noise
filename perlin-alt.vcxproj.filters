@@ -12,105 +12,111 @@
     <Filter Include="Events">
       <UniqueIdentifier>{b8c5fccc-ef90-4888-8110-b35c826425a2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Window">
-      <UniqueIdentifier>{d1da5467-d6fa-41d1-b9ca-d3c157a4d74e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Shader">
-      <UniqueIdentifier>{aab81adb-7395-417a-ac5b-5024b24da4ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Input">
-      <UniqueIdentifier>{aacb0904-431d-48d2-abf6-af275b79842d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Camera">
-      <UniqueIdentifier>{6c38ae27-478b-45d7-982c-4807b551f359}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Scene Manager">
-      <UniqueIdentifier>{c617d3cc-81d6-4352-8084-ca20d112492c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ImGui">
       <UniqueIdentifier>{6e323d16-50ec-4119-a8ba-2cb4d4115b37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Graphics">
+      <UniqueIdentifier>{0f82eabc-f1d8-4d4c-b3ba-af019f2d6ad3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Camera">
+      <UniqueIdentifier>{6c38ae27-478b-45d7-982c-4807b551f359}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Input">
+      <UniqueIdentifier>{aacb0904-431d-48d2-abf6-af275b79842d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Scene Manager">
+      <UniqueIdentifier>{c617d3cc-81d6-4352-8084-ca20d112492c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Shader">
+      <UniqueIdentifier>{aab81adb-7395-417a-ac5b-5024b24da4ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Window">
+      <UniqueIdentifier>{d1da5467-d6fa-41d1-b9ca-d3c157a4d74e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Perlin">
+      <UniqueIdentifier>{aa57c1eb-fdc4-4fba-b052-a3cb37f86681}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_tables.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\backends\imgui_impl_opengl3.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\backends\imgui_impl_glfw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="src\Input.cpp">
-      <Filter>Source Files\Input</Filter>
+      <Filter>Source Files\Graphics\Input</Filter>
     </ClCompile>
     <ClCompile Include="src\glslshader.cpp">
-      <Filter>Source Files\Shader</Filter>
+      <Filter>Source Files\Graphics\Shader</Filter>
     </ClCompile>
     <ClCompile Include="src\glhelper.cpp">
-      <Filter>Source Files\Window</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PerlinNoise.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics\Window</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.87\imgui-1.87\backends\imgui_impl_glfw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\imgui-1.87\imgui-1.87\backends\imgui_impl_opengl3.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerlinNoise.cpp">
+      <Filter>Source Files\Perlin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imgui.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\backends\imgui_impl_glfw.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\backends\imgui_impl_opengl3.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imgui_internal.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_rectpack.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_textedit.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_truetype.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
     <ClInclude Include="src\Camera.h">
-      <Filter>Source Files\Camera</Filter>
+      <Filter>Source Files\Graphics\Camera</Filter>
     </ClInclude>
     <ClInclude Include="src\Input.h">
-      <Filter>Source Files\Input</Filter>
+      <Filter>Source Files\Graphics\Input</Filter>
     </ClInclude>
     <ClInclude Include="src\KeyCodes.h">
-      <Filter>Source Files\Input</Filter>
+      <Filter>Source Files\Graphics\Input</Filter>
     </ClInclude>
     <ClInclude Include="src\glapp.h">
-      <Filter>Source Files\Scene Manager</Filter>
+      <Filter>Source Files\Graphics\Scene Manager</Filter>
     </ClInclude>
     <ClInclude Include="src\glslshader.h">
-      <Filter>Source Files\Shader</Filter>
+      <Filter>Source Files\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="src\glhelper.h">
-      <Filter>Source Files\Window</Filter>
+      <Filter>Source Files\Graphics\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.87\imgui-1.87\backends\imgui_impl_glfw.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.87\imgui-1.87\backends\imgui_impl_opengl3.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imstb_rectpack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imstb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imstb_truetype.h">
+      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="src\PerlinNoise.hpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Perlin</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
