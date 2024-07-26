@@ -1,2 +1,8 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+# Exclude library files
+lib/** linguist-vendored
+# Exclude texture files
+*.tex linguist-vendored
+# Convert .frag to GLSL
+*.frag linguist-language=GLSL
