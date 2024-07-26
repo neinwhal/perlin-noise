@@ -75,6 +75,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)lib\glfw-3.4.bin.WIN64\include;$(SolutionDir)lib\glew-2.2.0\include;$(SolutionDir)lib\glm-0.9.9.8;$(ProjectDir)include;$(SolutionDir)lib\assimp\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)lib\glfw-3.4.bin.WIN64\lib-vc2022;$(SolutionDir)lib\glew-2.2.0\lib\Release\x64;$(SolutionDir)lib\assimp\lib\Release;$(LibraryPath)</LibraryPath>
+    <OutDir>$(SolutionDir)builds\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>builds\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)builds\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>builds\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)builds\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>builds\$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)builds\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>builds\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
