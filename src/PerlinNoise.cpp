@@ -5,9 +5,9 @@
 #include <glm/gtc/noise.hpp>
 
 #include "KeyCodes.h"
-#include "../lib/imgui-1.87/imgui-1.87/imgui.h"
-#include "../lib/imgui-1.87/imgui-1.87/backends/imgui_impl_glfw.h"
-#include "../lib/imgui-1.87/imgui-1.87/backends/imgui_impl_opengl3.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 #include "PerlinNoise.hpp"
 
 void PerlinNoise::load()

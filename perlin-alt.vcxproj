@@ -73,8 +73,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SolutionDir)lib\glfw-3.4.bin.WIN64\include;$(SolutionDir)lib\glew-2.2.0\include;$(SolutionDir)lib\glm-0.9.9.8;$(ProjectDir)include;$(SolutionDir)lib\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)lib\glfw-3.4.bin.WIN64\lib-vc2022;$(SolutionDir)lib\glew-2.2.0\lib\Release\x64;$(SolutionDir)lib\assimp\lib\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)lib\glfw-3.3.8.bin.WIN64\include;$(SolutionDir)lib\glew-2.2.0\include;$(SolutionDir)lib\glm-0.9.9.8;$(SolutionDir)lib\imgui-1.90.8;$(SolutionDir)lib\assimp-5.4.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)lib\glfw-3.3.8.bin.WIN64\lib-vc2022;$(SolutionDir)lib\glew-2.2.0\lib\Release\x64;$(SolutionDir)lib\assimp-5.4.1\lib\Release\x64;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)builds\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>builds\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -145,7 +145,8 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>false</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>imgui-1.87</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -155,27 +156,20 @@
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3dll.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)lib\glfw-3.4.bin.WIN64\lib-vc2022\glfw3.dll" "$(TargetDir)glfw3.dll" /Y
+      <Command>copy "$(SolutionDir)lib\glfw-3.3.8.bin.WIN64\lib-vc2022\glfw3.dll" "$(TargetDir)glfw3.dll" /Y
 copy "$(SolutionDir)lib\glew-2.2.0\bin\Release\x64\glew32.dll" "$(TargetDir)glew32.dll" /Y
-copy "$(SolutionDir)lib\assimp\bin\Release\assimp-vc143-mt.dll" "$(TargetDir)assimp-vc143-mt.dll" /Y
-
-
-
-
-
-
-
-</Command>
+copy "$(SolutionDir)lib\assimp-5.4.1\bin\Release\x64\assimp-vc143-mt.dll" "$(TargetDir)assimp-vc143-mt.dll" /Y
+xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lib\imgui-1.87\imgui-1.87\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="lib\imgui-1.87\imgui-1.87\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui.cpp" />
-    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui_demo.cpp" />
-    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui_draw.cpp" />
-    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui_tables.cpp" />
-    <ClCompile Include="lib\imgui-1.87\imgui-1.87\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui.cpp" />
+    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
     <ClCompile Include="src\glslshader.cpp" />
     <ClCompile Include="src\Input.cpp" />
@@ -183,13 +177,15 @@ copy "$(SolutionDir)lib\assimp\bin\Release\assimp-vc143-mt.dll" "$(TargetDir)ass
     <ClCompile Include="src\PerlinNoise.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lib\imgui-1.87\imgui-1.87\backends\imgui_impl_glfw.h" />
-    <ClInclude Include="lib\imgui-1.87\imgui-1.87\backends\imgui_impl_opengl3.h" />
-    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imgui.h" />
-    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imgui_internal.h" />
-    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imstb_rectpack.h" />
-    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imstb_textedit.h" />
-    <ClInclude Include="lib\imgui-1.87\imgui-1.87\imstb_truetype.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imconfig.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_internal.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_textedit.h" />
+    <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imstb_truetype.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\glapp.h" />
     <ClInclude Include="src\glhelper.h" />

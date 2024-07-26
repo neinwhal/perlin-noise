@@ -11,9 +11,9 @@ an OpenGL context and implement a game loop.
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
 // Extension loader library's header must be included before GLFW's header!!!
-#include "../imgui-1.87/imgui-1.87/imgui.h"
-#include "../imgui-1.87/imgui-1.87/backends/imgui_impl_glfw.h"
-#include "../imgui-1.87/imgui-1.87/backends/imgui_impl_opengl3.h"
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 #include "glhelper.h"
 #include "glapp.h"
 #include <iostream>
