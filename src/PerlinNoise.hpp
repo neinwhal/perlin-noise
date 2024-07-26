@@ -308,9 +308,6 @@ private:
     Scene_Manager& _sceneManager;
     double elapsedTime;
 
-    // Shader
-    GLSLShader shdr_pgm;
-
     // Camera
     Camera camera;
     float m_cameraSpeed;

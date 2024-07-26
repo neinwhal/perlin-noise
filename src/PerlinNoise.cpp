@@ -12,51 +12,7 @@
 
 void PerlinNoise::load()
 {
-    // Vertex shader
-    const std::string vert_Shader = R"(
-        #version 450 core
-        layout (location = 0) in vec3 aVertexPosition;
-        layout (location = 1) in vec3 aVertexColor;
-        uniform mat4 mvpMatrix;
-        out vec3 FragPos;
-        out vec3 Color;
-        void main(void) {
-          gl_Position = mvpMatrix * vec4(aVertexPosition, 1.0);
-          FragPos = aVertexPosition;
-          Color = aVertexColor;
-        }
-   )";
-
-    // Fragment shader
-    const std::string frag_Shader = R"(
-        #version 450 core
-        in vec3 FragPos;
-        in vec3 Color;
-        out vec4 fFragColor;
-        uniform vec3 uLightPos;
-        uniform vec3 uViewPos;
-        void main() {
-          vec3 normal = normalize(cross(dFdx(FragPos), dFdy(FragPos)));
-          vec3 lightDir = normalize(uLightPos - FragPos);
-          float diff = max(dot(normal, lightDir), 0.0);
-          vec3 viewDir = normalize(uViewPos - FragPos);
-          vec3 reflectDir = reflect(-lightDir, normal);
-          float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-          vec3 ambient = 0.1 * Color;
-          vec3 diffuse = diff * Color;
-          vec3 specular = 0.2 * spec * vec3(1.0, 1.0, 1.0);
-          fFragColor = vec4(ambient + diffuse + specular, 1.0);
-      }
-  )";
-    shdr_pgm.CompileShaderFromString(GL_VERTEX_SHADER, vert_Shader);
-    shdr_pgm.CompileShaderFromString(GL_FRAGMENT_SHADER, frag_Shader);
-    if (!shdr_pgm.Link() || !shdr_pgm.Validate()) {
-        std::cout << "Shaders is not linked and/or not validated!" << std::endl;
-        std::cout << shdr_pgm.GetLog() << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
-    shdr_pgm.PrintActiveAttribs();
-    shdr_pgm.PrintActiveUniforms();
+    add_shader_programs("terrain", "shaders/terrain.vert", "shaders/terrain.frag");
 }
 
 
@@ -234,7 +190,7 @@ void PerlinNoise::draw()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    shdr_pgm.Use();
+    shdrpgms["terrain"].use();
 
     // Set up camera
     camera.setTarget(camera.getPosition() + GLHelper::cameraFront);
@@ -245,13 +201,16 @@ void PerlinNoise::draw()
     glm::mat4 view = camera.getViewMatrix();
 
     // Set uniforms
-    shdr_pgm.SetUniform("uLightPos", glm::vec3(5.0f, 5.0f, 5.0f));
-    shdr_pgm.SetUniform("uViewPos", camera.getPosition());
+    GLuint uniform_uLightPos = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "uLightPos");
+    glUniform3f(uniform_uLightPos, 5.0f, 5.0f, 5.0f);
+    GLuint uniform_uViewPos = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "uViewPos");
+    glUniform3f(uniform_uViewPos, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
     // Draw terrain
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 mvp = projection * view * model;
-    shdr_pgm.SetUniform("mvpMatrix", mvp);
+    GLuint uniform_mvpMatrix = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "mvpMatrix");
+    glUniformMatrix4fv(uniform_mvpMatrix, 1, GL_FALSE, glm::value_ptr(mvp));
 
     if (useDLA) {
         glBindVertexArray(vao[0]);
@@ -265,7 +224,7 @@ void PerlinNoise::draw()
                 model = glm::translate(model, glm::vec3(1.5f, 0.0f, 0.0f));
             }
             mvp = projection * view * model;
-            shdr_pgm.SetUniform("mvpMatrix", mvp);
+            glUniformMatrix4fv(uniform_mvpMatrix, 1, GL_FALSE, glm::value_ptr(mvp));
 
             glBindVertexArray(vao[i]);
             glDrawElements(GL_TRIANGLES, indices[i].size(), GL_UNSIGNED_INT, 0);
@@ -273,7 +232,7 @@ void PerlinNoise::draw()
     }
 
     glBindVertexArray(0);
-    shdr_pgm.UnUse();
+    shdrpgms["terrain"].unuse();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

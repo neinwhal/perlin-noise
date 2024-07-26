@@ -171,10 +171,10 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
-    <ClCompile Include="src\glslshader.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PerlinNoise.cpp" />
+    <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imconfig.h" />
@@ -189,10 +189,14 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\glapp.h" />
     <ClInclude Include="src\glhelper.h" />
-    <ClInclude Include="src\glslshader.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\KeyCodes.h" />
     <ClInclude Include="src\PerlinNoise.hpp" />
+    <ClInclude Include="src\shader.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\terrain.frag" />
+    <None Include="shaders\terrain.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

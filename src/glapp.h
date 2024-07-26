@@ -139,7 +139,6 @@ struct GLApp {
   // encapsulates state required to render a geometrical model
   struct GLModel {
 	  GLenum primitive_type{}; // which OpenGL primitive to be rendered?
-	  GLSLShader shdr_pgm; // which shader program?
 	  GLuint vaoid{}; // handle to VAO
 	  GLuint elem_cnt{}; // how many elements of primitive of type
 	  unsigned int texid;

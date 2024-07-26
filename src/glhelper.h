@@ -26,7 +26,7 @@ objects participating in the application.
 #include <array>
 #include <vector>
 #include <iostream>
-#include "glslshader.h"
+#include "shader.hpp"
 #include <sstream>
 #include <iomanip>
 #include "glapp.h"

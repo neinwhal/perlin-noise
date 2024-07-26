@@ -5,13 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Events">
-      <UniqueIdentifier>{b8c5fccc-ef90-4888-8110-b35c826425a2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ImGui">
       <UniqueIdentifier>{6e323d16-50ec-4119-a8ba-2cb4d4115b37}</UniqueIdentifier>
     </Filter>
@@ -36,13 +29,13 @@
     <Filter Include="Source Files\Perlin">
       <UniqueIdentifier>{aa57c1eb-fdc4-4fba-b052-a3cb37f86681}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Shaders">
+      <UniqueIdentifier>{47404435-736a-4f97-9450-a071d46f0329}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Input.cpp">
       <Filter>Source Files\Graphics\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="src\glslshader.cpp">
-      <Filter>Source Files\Graphics\Shader</Filter>
     </ClCompile>
     <ClCompile Include="src\glhelper.cpp">
       <Filter>Source Files\Graphics\Window</Filter>
@@ -74,6 +67,9 @@
     <ClCompile Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imgui_widgets.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\shader.cpp">
+      <Filter>Source Files\Graphics\Shader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h">
@@ -87,9 +83,6 @@
     </ClInclude>
     <ClInclude Include="src\glapp.h">
       <Filter>Source Files\Graphics\Scene Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="src\glslshader.h">
-      <Filter>Source Files\Graphics\Shader</Filter>
     </ClInclude>
     <ClInclude Include="src\glhelper.h">
       <Filter>Source Files\Graphics\Window</Filter>
@@ -124,5 +117,16 @@
     <ClInclude Include="..\..\CS350\cs-350\CS350_weijie.ang_3\lib\imgui-1.90.8\imgui\imconfig.h">
       <Filter>ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="src\shader.hpp">
+      <Filter>Source Files\Graphics\Shader</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\terrain.frag">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\terrain.vert">
+      <Filter>Source Files\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
