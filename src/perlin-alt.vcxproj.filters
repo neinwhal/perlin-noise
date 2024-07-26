@@ -32,9 +32,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_tables.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
@@ -59,14 +56,17 @@
     <ClCompile Include="src\glhelper.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
-    <ClCompile Include="src\glslshader.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="PerlinNoise.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glslshader.cpp">
+      <Filter>Source Files\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,11 +106,11 @@
     <ClInclude Include="KeyCodes.h">
       <Filter>Source Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\glslshader.h">
-      <Filter>Source Files\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="include\glhelper.h">
       <Filter>Source Files\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="glslshader.h">
+      <Filter>Source Files\Shader</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ pointers to OpenGL implementations.
 
 /*                                                                   includes
 ----------------------------------------------------------------------------- */
-#include <glhelper.h>
+#include "glhelper.h"
 
 
 

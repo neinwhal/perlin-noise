@@ -26,10 +26,10 @@ objects participating in the application.
 #include <array>
 #include <vector>
 #include <iostream>
-#include <glslshader.h>
+#include "glslshader.h"
 #include <sstream>
 #include <iomanip>
-#include <glapp.h>
+#include "glapp.h"
 #include <../Input.h>
 
 /*  _________________________________________________________________________ */

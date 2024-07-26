@@ -22,9 +22,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{b5f2b30c-2258-4a02-bf0b-4fe71a78f30e}</ProjectGuid>
-    <RootNamespace>Testing</RootNamespace>
+    <RootNamespace>perlin-alt</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>CSD350</ProjectName>
+    <ProjectName>perlin-alt</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -162,11 +162,11 @@ copy "$(SolutionDir)lib\assimp\bin\Release\assimp-vc143-mt.dll" "$(TargetDir)ass
     <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_draw.cpp" />
     <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_tables.cpp" />
     <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\imgui_widgets.cpp" />
+    <ClCompile Include="glslshader.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="PerlinNoise.cpp" />
-    <ClCompile Include="src\glhelper.cpp" />
-    <ClCompile Include="src\glslshader.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="glhelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\backends\imgui_impl_glfw.h" />
@@ -177,9 +177,9 @@ copy "$(SolutionDir)lib\assimp\bin\Release\assimp-vc143-mt.dll" "$(TargetDir)ass
     <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_textedit.h" />
     <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_truetype.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="include\glapp.h" />
-    <ClInclude Include="include\glhelper.h" />
-    <ClInclude Include="include\glslshader.h" />
+    <ClInclude Include="glslshader.h" />
+    <ClInclude Include="glapp.h" />
+    <ClInclude Include="glhelper.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="KeyCodes.h" />
     <ClInclude Include="PerlinNoise.hpp" />
