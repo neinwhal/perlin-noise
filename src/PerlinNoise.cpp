@@ -68,6 +68,24 @@ void PerlinNoise::update(double dt)
     // ImGui Stuff
     gui();
 
+    // apply wireframe
+    shdrpgms["terrain"].use();
+    GLuint uniform_uApplyLighting = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "uApplyLighting");
+    if (visualization_primitive == 1) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glUniform1i(uniform_uApplyLighting, false);
+    }
+    else if (visualization_primitive == 2) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        glUniform1i(uniform_uApplyLighting, false);
+        glPointSize(2.f);
+    }
+    else {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glUniform1i(uniform_uApplyLighting, true);
+    }
+    shdrpgms["terrain"].unuse();
+
     // Call draw function to draw the scene
 	draw();
 }
@@ -89,7 +107,7 @@ void PerlinNoise::draw()
 
     // Set uniforms
     GLuint uniform_uLightPos = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "uLightPos");
-    glUniform3f(uniform_uLightPos, 5.0f, 5.0f, 5.0f);
+    glUniform3f(uniform_uLightPos, light_position.x, light_position.y, light_position.z);
     GLuint uniform_uViewPos = glGetUniformLocation(shdrpgms["terrain"].get_handle(), "uViewPos");
     glUniform3f(uniform_uViewPos, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
