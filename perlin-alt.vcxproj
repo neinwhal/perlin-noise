@@ -173,6 +173,8 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClCompile Include="src\glhelper.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\PerlinControl.cpp" />
+    <ClCompile Include="src\PerlinGui.cpp" />
     <ClCompile Include="src\PerlinNoise.cpp" />
     <ClCompile Include="src\shader.cpp" />
   </ItemGroup>

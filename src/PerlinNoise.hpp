@@ -297,6 +297,9 @@ public:
     virtual void draw() override;
     virtual void cleanup() override;
 
+    void control(double dt);
+    void gui();
+
 private:
     struct Vertex {
         glm::vec3 position;

@@ -70,6 +70,12 @@
     <ClCompile Include="src\shader.cpp">
       <Filter>Source Files\Graphics\Shader</Filter>
     </ClCompile>
+    <ClCompile Include="src\PerlinGui.cpp">
+      <Filter>Source Files\Perlin</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerlinControl.cpp">
+      <Filter>Source Files\Perlin</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h">
