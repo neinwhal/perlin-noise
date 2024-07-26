@@ -30,7 +30,7 @@ objects participating in the application.
 #include <sstream>
 #include <iomanip>
 #include "glapp.h"
-#include <../Input.h>
+#include "Input.h"
 
 /*  _________________________________________________________________________ */
 struct GLHelper

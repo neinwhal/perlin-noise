@@ -20,7 +20,7 @@ and transformations (in later labs).
 #ifndef GLAPP_H
 #define GLAPP_H
 #include "glhelper.h"
-#include <../Input.h>
+#include "Input.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include "unordered_map"
 

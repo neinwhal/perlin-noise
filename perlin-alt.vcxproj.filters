@@ -53,32 +53,23 @@
     <ClCompile Include="..\lib\imgui-1.87\imgui-1.87\backends\imgui_impl_glfw.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\Input.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\glslshader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
     <ClCompile Include="src\glhelper.cpp">
       <Filter>Source Files\Window</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Source Files\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="PerlinNoise.cpp">
+    <ClCompile Include="src\PerlinNoise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="glslshader.cpp">
-      <Filter>Source Files\Shader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\glapp.h">
-      <Filter>Source Files\Scene Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Source Files\Camera</Filter>
-    </ClInclude>
-    <ClInclude Include="PerlinNoise.hpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imgui.h">
       <Filter>ImGui</Filter>
     </ClInclude>
@@ -100,17 +91,26 @@
     <ClInclude Include="..\lib\imgui-1.87\imgui-1.87\imstb_truetype.h">
       <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
+    <ClInclude Include="src\Camera.h">
+      <Filter>Source Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Input.h">
       <Filter>Source Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="KeyCodes.h">
+    <ClInclude Include="src\KeyCodes.h">
       <Filter>Source Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="include\glhelper.h">
+    <ClInclude Include="src\glapp.h">
+      <Filter>Source Files\Scene Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glslshader.h">
+      <Filter>Source Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\glhelper.h">
       <Filter>Source Files\Window</Filter>
     </ClInclude>
-    <ClInclude Include="glslshader.h">
-      <Filter>Source Files\Shader</Filter>
+    <ClInclude Include="src\PerlinNoise.hpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -20,8 +20,8 @@ Contents:
     float y = RE_input::get_mouse_y();
 
 ====================================================================================*/
-#include <../Input.h>
-#include <../glhelper.h>
+#include "Input.h"
+#include "glhelper.h"
 
 class RE_input {
 public:
