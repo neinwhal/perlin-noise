@@ -157,7 +157,7 @@ void PerlinNoise::gui_terrain_visualization() {
     std::vector<unsigned char> terrainData_3(flat_blurry_dlaData.size() * 4); // x4 to accommodate RGBA
 
     float max_value = *std::max_element(flat_blurry_dlaData.begin(), flat_blurry_dlaData.end());
-    if (max_value > 0) {
+    if (max_value > 0.f) {
         for (auto& value : flat_blurry_dlaData) {
             value /= max_value;
         }

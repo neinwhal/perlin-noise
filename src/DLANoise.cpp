@@ -58,7 +58,7 @@ std::vector<std::vector<float>> simpleAverageConvolution(const std::vector<std::
             }
 
             // Calculate the average
-            output[i][j] = sum / count;
+            output[i][j] = sum / static_cast<float>(count);
         }
     }
 
@@ -185,17 +185,17 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
                 float bottom_right = blurry_dlaData[x1][y1];
 
                 // Perform bilinear interpolation
-                float top_interpolated = top_left * (1 - x_weight) + top_right * x_weight;
-                float bottom_interpolated = bottom_left * (1 - x_weight) + bottom_right * x_weight;
-                float interpolated_value = top_interpolated * (1 - y_weight) + bottom_interpolated * y_weight;
+                float interpolated_value = (top_left * (1 - x_weight) * (1 - y_weight) +
+                    top_right * x_weight * (1 - y_weight) +
+                    bottom_left * (1 - x_weight) * y_weight +
+                    bottom_right * x_weight * y_weight);
 
                 // Assign the interpolated value to the new_blurry_dlaData
                 new_blurry_dlaData[i][j] = interpolated_value;
             }
         }
         blurry_dlaData = new_blurry_dlaData;
-        blurry_dlaData = simpleAverageConvolution(blurry_dlaData);
-
+        
         // CRISP upscale
         dlaData.clear();
         dlaData.resize(new_size, std::vector<float>(new_size, 0.f));
@@ -301,9 +301,9 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
         for (size_t i = 0; i < dlaData.size(); ++i) {
             for (size_t j = 0; j < dlaData[0].size(); ++j) {
                 blurry_dlaData[i][j] += dlaData[i][j];
-                //if (blurry_dlaData[i][j] > 1.f) blurry_dlaData[i][j] = 1.f;
             }
         }
+        blurry_dlaData = simpleAverageConvolution(blurry_dlaData);
 
         //for 
     }
