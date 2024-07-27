@@ -87,10 +87,13 @@ std::vector<float> flatten2DVector(const std::vector<std::vector<float>>& vec2D)
 
 // Visualization
 void PerlinNoise::gui_terrain_visualization() {
-    ImGui::Begin("Terrain Visualization");
-    ImVec2 previewSize(static_cast<float>(500), static_cast<float>(500));
-    ImGui::Text("Perlin Noise Preview");
+    ImGui::Begin("Perlin Noise Height Maps");
 
+
+
+    ImVec2 previewSize(static_cast<float>(400), static_cast<float>(400));
+
+    ImGui::Text("Alternative Perlin Noise Height Map");
     static GLuint terrainTextureID = 0;
     if (terrainTextureID == 0) {
         glGenTextures(1, &terrainTextureID);
@@ -100,9 +103,8 @@ void PerlinNoise::gui_terrain_visualization() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
-
     std::vector<unsigned char> terrainData(outputWidth * outputDepth * 4); // x4 to accommodate RGBA
-    const std::vector<float>& sourceData = altPerlinNoise;
+    const std::vector<float>& sourceData = perlinNoise;
     for (int i = 0; i < outputWidth * outputDepth; ++i) {
         unsigned char value = static_cast<unsigned char>(sourceData[i] * 255.0f);
         terrainData[i * 4 + 0] = value; // R
@@ -110,20 +112,56 @@ void PerlinNoise::gui_terrain_visualization() {
         terrainData[i * 4 + 2] = value; // B
         terrainData[i * 4 + 3] = 255;   // A (fully opaque)
     }
-
     glBindTexture(GL_TEXTURE_2D, terrainTextureID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, outputWidth, outputDepth, 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData.data());
-
     ImGui::Image((void*)(intptr_t)terrainTextureID, previewSize);
+
+
+    ImVec2 previewSize_alt(static_cast<float>(400), static_cast<float>(400));
+
+    ImGui::Text("Alternative Perlin Noise Height Map");
+    static GLuint terrainTextureID_1 = 1;
+    if (terrainTextureID_1 == 1) {
+        glGenTextures(1, &terrainTextureID_1);
+        glBindTexture(GL_TEXTURE_2D, terrainTextureID_1);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    std::vector<unsigned char> terrainData_1(outputWidth * outputDepth * 4); // x4 to accommodate RGBA
+    const std::vector<float>& sourceData_1 = altPerlinNoise;
+    for (int i = 0; i < outputWidth * outputDepth; ++i) {
+        unsigned char value = static_cast<unsigned char>(sourceData_1[i] * 255.0f);
+        terrainData_1[i * 4 + 0] = value; // R
+        terrainData_1[i * 4 + 1] = value; // G
+        terrainData_1[i * 4 + 2] = value; // B
+        terrainData_1[i * 4 + 3] = 255;   // A (fully opaque)
+    }
+    glBindTexture(GL_TEXTURE_2D, terrainTextureID_1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, outputWidth, outputDepth, 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData_1.data());
+    ImGui::Image((void*)(intptr_t)terrainTextureID_1, previewSize_alt);
     ImGui::End();
 
-    ImGui::Begin("DLA Terrain Preview");
 
+
+
+
+
+
+
+
+
+
+
+
+    ImGui::Begin("DLA Height Maps");
   
     // crisp DLA image
-    ImVec2 DLA_preview(500, 500);
-    static GLuint terrainTextureID_2 = 1;
-    if (terrainTextureID_2 == 1) {
+    ImVec2 DLA_preview(400, 400);
+    ImGui::Text("Crisp DLA Height Map");
+    static GLuint terrainTextureID_2 = 2;
+    if (terrainTextureID_2 == 2) {
         glGenTextures(1, &terrainTextureID_2);
         glBindTexture(GL_TEXTURE_2D, terrainTextureID_2);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -149,9 +187,10 @@ void PerlinNoise::gui_terrain_visualization() {
     ImGui::Image((void*)(intptr_t)terrainTextureID_2, DLA_preview);
 
     // blurry DLA image
-    ImVec2 blurry_DLA_preview(500, 500);
-    static GLuint terrainTextureID_3 = 2;
-    if (terrainTextureID_3 == 2) {
+    ImVec2 blurry_DLA_preview(400, 400);
+    ImGui::Text("Smoothed DLA Height Map");
+    static GLuint terrainTextureID_3 = 3;
+    if (terrainTextureID_3 == 3) {
         glGenTextures(1, &terrainTextureID_3);
         glBindTexture(GL_TEXTURE_2D, terrainTextureID_3);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -182,46 +221,74 @@ void PerlinNoise::gui_terrain_visualization() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(blurry_dlaData[0].size()), static_cast<GLsizei>(blurry_dlaData.size()), 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData_3.data());
 
     ImGui::Image((void*)(intptr_t)terrainTextureID_3, blurry_DLA_preview);
-
-
-    // mountain DLA image
-    if (!mountData.empty()) {
-        ImVec2 mount_DLA_preview(500, 500);
-        static GLuint terrainTextureID_4 = 3;
-        if (terrainTextureID_4 == 3) {
-            glGenTextures(1, &terrainTextureID_4);
-            glBindTexture(GL_TEXTURE_2D, terrainTextureID_4);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        }
-
-        std::vector<float> flat_mountData = flatten2DVector(mountData);
-        std::vector<unsigned char> terrainData_4(flat_mountData.size() * 4); // x4 to accommodate RGBA
-
-        float max_value_m = *std::max_element(flat_mountData.begin(), flat_mountData.end());
-        if (max_value_m > 0.f) {
-            for (auto& value : flat_mountData) {
-                value /= max_value_m;
-            }
-        }
-
-        for (int i = 0; i < flat_mountData.size(); ++i) {
-            unsigned char value = static_cast<unsigned char>(std::min(flat_mountData[i] * 255.0f, 255.0f));
-            terrainData_4[i * 4 + 0] = value; // R
-            terrainData_4[i * 4 + 1] = value; // G
-            terrainData_4[i * 4 + 2] = value; // B
-            terrainData_4[i * 4 + 3] = 255;   // A (fully opaque)
-        }
-
-        glBindTexture(GL_TEXTURE_2D, terrainTextureID_4);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(mountData[0].size()), static_cast<GLsizei>(mountData.size()), 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData_4.data());
-
-        ImGui::Image((void*)(intptr_t)terrainTextureID_4, mount_DLA_preview);
-    }
-
     ImGui::End();
 
-    // mountain DLA image
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ImGui::Begin("Perlin Noise + Gradient Height Maps");
+    ImVec2 previewSize_2(static_cast<float>(400), static_cast<float>(400));
+
+    ImGui::Text("Perlin Noise + Gradient Height Map");
+    static GLuint terrainTextureID_4 = 4;
+    if (terrainTextureID_4 == 4) {
+        glGenTextures(1, &terrainTextureID_4);
+        glBindTexture(GL_TEXTURE_2D, terrainTextureID_4);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    std::vector<unsigned char> terrainData_4(outputWidth * outputDepth * 4); // x4 to accommodate RGBA
+    const std::vector<float>& sourceData_4 = perlinNoiseWithGradient;
+    for (int i = 0; i < outputWidth * outputDepth; ++i) {
+        unsigned char value = static_cast<unsigned char>(sourceData_4[i] * 255.0f);
+        terrainData_4[i * 4 + 0] = value; // R
+        terrainData_4[i * 4 + 1] = value; // G
+        terrainData_4[i * 4 + 2] = value; // B
+        terrainData_4[i * 4 + 3] = 255;   // A (fully opaque)
+    }
+    glBindTexture(GL_TEXTURE_2D, terrainTextureID_4);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, outputWidth, outputDepth, 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData_4.data());
+    ImGui::Image((void*)(intptr_t)terrainTextureID_4, previewSize_2);
+
+
+    ImVec2 previewSize_2_alt(static_cast<float>(400), static_cast<float>(400));
+
+    ImGui::Text("Alternative Perlin Noise + Gradient Height Map");
+    static GLuint terrainTextureID_5 = 5;
+    if (terrainTextureID_5 == 5) {
+        glGenTextures(1, &terrainTextureID_5);
+        glBindTexture(GL_TEXTURE_2D, terrainTextureID_5);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    std::vector<unsigned char> terrainData_5(outputWidth * outputDepth * 4); // x4 to accommodate RGBA
+    const std::vector<float>& sourceData_5 = altPerlinNoiseWithGradient;
+    for (int i = 0; i < outputWidth * outputDepth; ++i) {
+        unsigned char value = static_cast<unsigned char>(sourceData_5[i] * 255.0f);
+        terrainData_5[i * 4 + 0] = value; // R
+        terrainData_5[i * 4 + 1] = value; // G
+        terrainData_5[i * 4 + 2] = value; // B
+        terrainData_5[i * 4 + 3] = 255;   // A (fully opaque)
+    }
+    glBindTexture(GL_TEXTURE_2D, terrainTextureID_5);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, outputWidth, outputDepth, 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData_5.data());
+    ImGui::Image((void*)(intptr_t)terrainTextureID_5, previewSize_2_alt);
+    ImGui::End();
 }
