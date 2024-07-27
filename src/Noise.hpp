@@ -84,6 +84,7 @@ private:
     };
 
     std::vector<std::vector<float>> dlaData;
+    std::vector<std::vector<float>> blurry_dlaData;
     std::vector<dlaNode> dlaList;
 
     // Perlin Noise functions

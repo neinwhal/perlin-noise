@@ -18,13 +18,51 @@ int getCenterIndex(int gridSize, int quadrantIndex) {
 	}
 }
 
-float get_relative_pos(int x, size_t size) {
-	return static_cast<float>(x) / static_cast<float>(size - 1);
+float get_squeezed_pos(int pos, size_t size) {
+    return static_cast<float>(pos) / static_cast<float>(size - 1);
+    //float ratio = static_cast<float>(pos) / static_cast<float>(size - 1);
+    //return 0.1f + 0.8f * ratio; // Squeeze towards the center
 }
 
-float get_squeezed_pos(int pos, size_t size) {
-    float ratio = static_cast<float>(pos) / static_cast<float>(size - 1);
-    return 0.1f + 0.8f * ratio; // Squeeze towards the center
+// Function to perform convolution on a 2D vector with a simple averaging kernel
+std::vector<std::vector<float>> simpleAverageConvolution(const std::vector<std::vector<float>>& input) {
+    int rows = static_cast<int>(input.size());
+    int cols = static_cast<int>(input[0].size());
+
+    std::vector<std::vector<float>> output(rows, std::vector<float>(cols, 0.0f));
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            float sum = input[i][j];
+            int count = 1;
+
+            // Check up
+            if (i > 0) {
+                sum += input[i - 1][j];
+                count++;
+            }
+            // Check down
+            if (i < rows - 1) {
+                sum += input[i + 1][j];
+                count++;
+            }
+            // Check left
+            if (j > 0) {
+                sum += input[i][j - 1];
+                count++;
+            }
+            // Check right
+            if (j < cols - 1) {
+                sum += input[i][j + 1];
+                count++;
+            }
+
+            // Calculate the average
+            output[i][j] = sum / count;
+        }
+    }
+
+    return output;
 }
 
 // New method to generate DLA terrain
@@ -49,7 +87,7 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
             -1.f, -1.f
             });
 
-        while (dlaList.size() < ((dlaData.size() * dlaData[0].size()) / 4)) {
+        while (dlaList.size() < ((dlaData.size() * dlaData[0].size()) / 12)) {
             // Add a random dot
             bool populated = true;
             int dot_location_x, dot_location_y;
@@ -106,14 +144,59 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
                 get_squeezed_pos(dot_location_x, dlaData[0].size()),
                 get_squeezed_pos(dot_location_y, dlaData.size()),
                 neighbour_x, neighbour_y
-                });
+            });
         }
+        blurry_dlaData = dlaData;
     }
 
     if (stage == 1) {
         // Resize to a higher level
+        size_t old_size = dlaData.size();
         size_t new_size = dlaData.size() * 2;
 
+        // BLURRY upscale
+        std::vector<std::vector<float>> new_blurry_dlaData;
+        new_blurry_dlaData.resize(new_size, std::vector<float>(new_size, 0.f));
+
+        for (size_t i = 0; i < new_size; ++i) {
+            for (size_t j = 0; j < new_size; ++j) {
+                // Calculate the corresponding positions in the old data
+                float old_x = static_cast<float>(i) / 2.0f;
+                float old_y = static_cast<float>(j) / 2.0f;
+
+                int x0 = static_cast<int>(std::floor(old_x));
+                int x1 = x0 + 1;
+                int y0 = static_cast<int>(std::floor(old_y));
+                int y1 = y0 + 1;
+
+                // Boundary check
+                x0 = std::clamp(x0, 0, static_cast<int>(old_size - 1));
+                x1 = std::clamp(x1, 0, static_cast<int>(old_size - 1));
+                y0 = std::clamp(y0, 0, static_cast<int>(old_size - 1));
+                y1 = std::clamp(y1, 0, static_cast<int>(old_size - 1));
+
+                float x_weight = old_x - x0;
+                float y_weight = old_y - y0;
+
+                // Get the values from the four corners
+                float top_left = blurry_dlaData[x0][y0];
+                float top_right = blurry_dlaData[x1][y0];
+                float bottom_left = blurry_dlaData[x0][y1];
+                float bottom_right = blurry_dlaData[x1][y1];
+
+                // Perform bilinear interpolation
+                float top_interpolated = top_left * (1 - x_weight) + top_right * x_weight;
+                float bottom_interpolated = bottom_left * (1 - x_weight) + bottom_right * x_weight;
+                float interpolated_value = top_interpolated * (1 - y_weight) + bottom_interpolated * y_weight;
+
+                // Assign the interpolated value to the new_blurry_dlaData
+                new_blurry_dlaData[i][j] = interpolated_value;
+            }
+        }
+        blurry_dlaData = new_blurry_dlaData;
+        blurry_dlaData = simpleAverageConvolution(blurry_dlaData);
+
+        // CRISP upscale
         dlaData.clear();
         dlaData.resize(new_size, std::vector<float>(new_size, 0.f));
 
@@ -214,5 +297,14 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
                 neighbour_x, neighbour_y
                 });
         }
+
+        for (size_t i = 0; i < dlaData.size(); ++i) {
+            for (size_t j = 0; j < dlaData[0].size(); ++j) {
+                blurry_dlaData[i][j] += dlaData[i][j];
+                //if (blurry_dlaData[i][j] > 1.f) blurry_dlaData[i][j] = 1.f;
+            }
+        }
+
+        //for 
     }
 }
