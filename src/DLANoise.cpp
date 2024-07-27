@@ -308,3 +308,87 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
         //for 
     }
 }
+
+
+void PerlinNoise::GenerateTerrainDLA() {
+    // Calculate the correct size for a square grid
+    int dlaSize = static_cast<int>(std::sqrt(flat_blurry_dlaData.size()));
+    float minHeight = 0.0f;
+    float maxHeight = 1.0f;
+
+    vertices[DLA_NOISE].clear();
+    indices[DLA_NOISE].clear();
+
+    // Color palette 
+    glm::vec3 deepWaterColor(0.0f, 0.05f, 0.3f);
+    glm::vec3 shallowWaterColor(0.0f, 0.4f, 0.8f);
+    glm::vec3 sandColor(0.76f, 0.7f, 0.5f);
+    glm::vec3 grassColor(0.0f, 0.5f, 0.0f);
+    glm::vec3 forestColor(0.0f, 0.3f, 0.0f);
+    glm::vec3 rockColor(0.5f, 0.5f, 0.5f);
+    glm::vec3 snowColor(1.0f, 1.0f, 1.0f);
+
+    float waterLevel = 0.35f;
+
+    // Find the min and max heights in the data for better normalization
+    float dataMin = *std::min_element(flat_blurry_dlaData.begin(), flat_blurry_dlaData.end());
+    float dataMax = *std::max_element(flat_blurry_dlaData.begin(), flat_blurry_dlaData.end());
+
+    for (int z = 0; z < dlaSize; z++) {
+        for (int x = 0; x < dlaSize; x++) {
+            int index = z * dlaSize + x;
+            float normalizedHeight = (flat_blurry_dlaData[index] - dataMin) / (dataMax - dataMin);
+            float y = minHeight + normalizedHeight * (maxHeight - minHeight);
+
+            glm::vec3 position(
+                x / static_cast<float>(dlaSize - 1) - 0.5f,
+                y * heightMultiplier,
+                z / static_cast<float>(dlaSize - 1) - 0.5f
+            );
+
+            glm::vec3 color;
+
+            if (normalizedHeight < waterLevel) {
+                float waterDepth = (waterLevel - normalizedHeight) / waterLevel;
+                color = glm::mix(shallowWaterColor, deepWaterColor, waterDepth);
+                position.y = waterLevel * heightMultiplier;
+            }
+            else if (normalizedHeight < 0.4f) {
+                float t = (normalizedHeight - waterLevel) / 0.05f;
+                color = glm::mix(sandColor, grassColor, t);
+            }
+            else if (normalizedHeight < 0.7f) {
+                float t = (normalizedHeight - 0.4f) / 0.3f;
+                color = glm::mix(grassColor, forestColor, t);
+            }
+            else if (normalizedHeight < 0.85f) {
+                float t = (normalizedHeight - 0.7f) / 0.15f;
+                color = glm::mix(forestColor, rockColor, t);
+            }
+            else {
+                float t = (normalizedHeight - 0.85f) / 0.15f;
+                color = glm::mix(rockColor, snowColor, t);
+            }
+
+            vertices[DLA_NOISE].push_back({ position, color });
+        }
+    }
+
+    // Generate indices
+    for (int z = 0; z < dlaSize - 1; z++) {
+        for (int x = 0; x < dlaSize - 1; x++) {
+            int topLeft = z * dlaSize + x;
+            int topRight = topLeft + 1;
+            int bottomLeft = (z + 1) * dlaSize + x;
+            int bottomRight = bottomLeft + 1;
+
+            indices[DLA_NOISE].push_back(topLeft);
+            indices[DLA_NOISE].push_back(bottomLeft);
+            indices[DLA_NOISE].push_back(topRight);
+
+            indices[DLA_NOISE].push_back(topRight);
+            indices[DLA_NOISE].push_back(bottomLeft);
+            indices[DLA_NOISE].push_back(bottomRight);
+        }
+    }
+}

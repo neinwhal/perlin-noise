@@ -85,6 +85,7 @@ private:
 
     std::vector<std::vector<float>> dlaData;
     std::vector<std::vector<float>> blurry_dlaData;
+	std::vector<float> flat_blurry_dlaData;
     std::vector<dlaNode> dlaList;
 
     // Perlin Noise functions
@@ -174,7 +175,7 @@ private:
     void GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData, std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
     glm::vec2 CalculateGradient(int x, int z, int width, int depth, const std::vector<float>& noise);
     
-    
+	void GenerateTerrainDLA();
     void GenerateDLATerrain(int stage);
     bool useDLA;
 
@@ -182,7 +183,7 @@ private:
     void RegenerateNoise();
 
     // Buffer Stuff - for perlin noise plane and the perlin noise + gradient plane
-    GLuint vao[2]{}, vbo[2]{}, ebo[2]{};
-    std::vector<Vertex> vertices[2];
-    std::vector<unsigned int> indices[2];
+    GLuint vao[3]{}, vbo[3]{}, ebo[3]{};
+    std::vector<Vertex> vertices[3];
+    std::vector<unsigned int> indices[3];
 };

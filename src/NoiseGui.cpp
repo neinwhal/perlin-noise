@@ -38,30 +38,40 @@ void PerlinNoise::gui_settings() {
 // Terrain Generation Controls
 void PerlinNoise::gui_terrain_gen_controls() {
     ImGui::Begin("Terrain Generation Controls");
+
     if (ImGui::Checkbox("Use DLA Terrain", &useDLA)) {
+        if (useDLA) {
+            GenerateDLATerrain(1);
+        }
         RegenerateNoise();
     }
 
+    // Separate sections for DLA and Perlin controls
     if (useDLA) {
-
+        ImGui::Text("DLA Terrain Settings");
+        // Add whatever DLA shit here. 
     }
     else {
-        // Existing Perlin noise controls
-        if (ImGui::SliderInt("Octave Count", &octaveCount, 1, 8) ||
-            ImGui::SliderFloat("Height Multiplier", &heightMultiplier, 0.1f, 5.0f, "%.2f") ||
-            ImGui::SliderFloat("Gradient Factor", &gradientFactor, 0.0f, 30.0f, "%.2f") ||
-            ImGui::SliderFloat("Persistence", &persistence, 0.1f, 1.0f, "%.2f"))
-        {
+        ImGui::Text("Perlin Noise Settings");
+        bool changed = false;
+        changed |= ImGui::SliderInt("Octave Count", &octaveCount, 1, 8);
+        changed |= ImGui::SliderFloat("Height Multiplier", &heightMultiplier, 0.1f, 5.0f, "%.2f");
+        changed |= ImGui::SliderFloat("Gradient Factor", &gradientFactor, 0.0f, 30.0f, "%.2f");
+        changed |= ImGui::SliderFloat("Persistence", &persistence, 0.1f, 1.0f, "%.2f");
+
+        if (changed) {
             RegenerateNoise();
         }
     }
 
+    // Regenerate button
     if (ImGui::Button("Regenerate Terrain")) {
         if (!useDLA) {
             InitializePermutationVector();
         }
         RegenerateNoise();
     }
+
     ImGui::End();
 }
 
@@ -109,10 +119,7 @@ void PerlinNoise::gui_terrain_visualization() {
 
     ImGui::Begin("DLA Terrain Preview");
 
-    if (ImGui::Button("Generate Next Stage")) {
-        GenerateDLATerrain(1);
-    }
-
+  
     // crisp DLA image
     ImVec2 DLA_preview(500, 500);
     static GLuint terrainTextureID_2 = 1;
@@ -153,7 +160,7 @@ void PerlinNoise::gui_terrain_visualization() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    std::vector<float> flat_blurry_dlaData = flatten2DVector(blurry_dlaData);
+    flat_blurry_dlaData = flatten2DVector(blurry_dlaData);
     std::vector<unsigned char> terrainData_3(flat_blurry_dlaData.size() * 4); // x4 to accommodate RGBA
 
     float max_value = *std::max_element(flat_blurry_dlaData.begin(), flat_blurry_dlaData.end());
