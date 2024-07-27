@@ -125,7 +125,7 @@ abstracted away in GLApp::init
 */
 static void init() {
   // Part 1
-  if (!GLHelper::init(1300, 1300, "Assignment 2 - Bounding Volumes Representation ")) {
+  if (!GLHelper::init(1920, 1080, "Assignment 2 - Bounding Volumes Representation ")) {
     std::cout << "Unable to create OpenGL context" << std::endl;
     std::exit(EXIT_FAILURE);
   }

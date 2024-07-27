@@ -283,15 +283,7 @@ public:
         : _sceneManager(sceneManager), _name(name), elapsedTime(0.0f),
         visualization_primitive(0), light_position(glm::vec3(5.f, 5.f, 5.f)),
         outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.07f),
-        gradientFactor(5.03f), useDLA(false),
-        dlaInitialPoints(1),
-        dlaErosionIterations(1),
-        dlaErosionStrength(0.1f),
-        dlaSmoothingPasses(2),
-        dlaGenerator(134137),
-        dlaHeightScale(1.0f),
-        dlaHeightOffset(0.0f),
-        dlaHeightPower(1.0f)
+        gradientFactor(5.03f), useDLA(false)
     {
         perlinNoise.resize(outputWidth * outputDepth);
         perlinNoiseWithGradient.resize(outputWidth * outputDepth);
@@ -332,6 +324,7 @@ private:
     int outputWidth, outputDepth;
     std::vector<float> perlinNoise;
     std::vector<float> perlinNoiseWithGradient;
+    std::vector<float> dlaNoise;
     int octaveCount;
     float persistence;
     float heightMultiplier;
@@ -427,25 +420,10 @@ private:
     
     
     void GenerateDLATerrain();
-	void GenerateDLATerrainMesh(std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
-	void ResizeTerrain(std::vector<float>& terrain, int width, int depth);
+    bool useDLA;
 
     // Regenerate
     void RegenerateNoise();
-
-    // DLA Generaor
-    bool useDLA;
-    int dlaInitialSize;
-    int dlaTargetSize;
-    ImprovedDLATerrainGenerator dlaGenerator;
-    std::vector<float> dlaTerrain;
-    int dlaInitialPoints;
-    int dlaErosionIterations;
-    float dlaErosionStrength;
-    int dlaSmoothingPasses;
-    float dlaHeightScale;
-    float dlaHeightOffset;
-    float dlaHeightPower;
 
     // Buffer Stuff - for perlin noise plane and the perlin noise + gradient plane
     GLuint vao[2]{}, vbo[2]{}, ebo[2]{};

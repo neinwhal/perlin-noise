@@ -26,6 +26,8 @@ void PerlinNoise::init() {
     GeneratePerlinNoise();
     GeneratePerlinNoiseWithGradient();
 
+    GenerateDLATerrain();
+
     // Generate terrain for both planes
     GeneratePerlinNoiseTerrain(perlinNoise, vertices[PERLIN_NOISE], indices[PERLIN_NOISE]);
     GeneratePerlinNoiseTerrain(perlinNoiseWithGradient, vertices[GRAIDENT_NOISE], indices[GRAIDENT_NOISE]);
@@ -153,13 +155,7 @@ void PerlinNoise::cleanup() {
 void PerlinNoise::RegenerateNoise() {
     if (useDLA) {
         // DLA ///////////////////////////////////////////////////
-        dlaGenerator.SetOutputSize(outputWidth, outputDepth);
-        dlaGenerator.SetInitialPoints(dlaInitialPoints);
-        dlaGenerator.SetErosionIterations(dlaErosionIterations);
-        dlaGenerator.SetErosionStrength(dlaErosionStrength);
-        dlaGenerator.SetSmoothingPasses(dlaSmoothingPasses);
-        dlaTerrain = dlaGenerator.GenerateTerrain();
-        GenerateDLATerrainMesh(vertices[0], indices[0]);
+        
     }
     else {
         // PERLIN ///////////////////////////////////////////////
