@@ -79,10 +79,10 @@
     <ClCompile Include="src\NoiseVisual.cpp">
       <Filter>Source Files\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="src\PerlinGradient.cpp">
+    <ClCompile Include="src\PerlinNoise.cpp">
       <Filter>Source Files\Terrain</Filter>
     </ClCompile>
-    <ClCompile Include="src\PerlinNoise.cpp">
+    <ClCompile Include="src\GradientNoise.cpp">
       <Filter>Source Files\Terrain</Filter>
     </ClCompile>
   </ItemGroup>

@@ -81,7 +81,7 @@ void PerlinNoise::gui_terrain_gen_controls() {
 // Visualization
 void PerlinNoise::gui_terrain_visualization() {
     ImGui::Begin("Terrain Visualization");
-    ImVec2 previewSize(400, 400);
+    ImVec2 previewSize(static_cast<float>(outputWidth), static_cast<float>(outputDepth));
     ImGui::Text(useDLA ? "DLA Terrain Preview" : "Perlin Noise Preview");
 
     static GLuint terrainTextureID = 0;
@@ -94,7 +94,7 @@ void PerlinNoise::gui_terrain_visualization() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    std::vector<unsigned char> terrainData(outputWidth * outputDepth * 4);
+    std::vector<unsigned char> terrainData(outputWidth * outputDepth * 4); // x4 to accomodate RGBA
     const std::vector<float>& sourceData = useDLA ? dlaTerrain : perlinNoise;
     for (int i = 0; i < outputWidth * outputDepth; ++i) {
         unsigned char value = static_cast<unsigned char>(sourceData[i] * 255.0f);
@@ -109,4 +109,5 @@ void PerlinNoise::gui_terrain_visualization() {
 
     ImGui::Image((void*)(intptr_t)terrainTextureID, previewSize);
     ImGui::End();
+
 }

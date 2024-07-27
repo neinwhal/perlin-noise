@@ -172,6 +172,7 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\DLANoise.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
+    <ClCompile Include="src\GradientNoise.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\NoiseControl.cpp" />
