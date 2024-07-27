@@ -18,6 +18,12 @@
 #include <algorithm>
 #include <iostream>
 
+enum terrain_types {
+    PERLIN_NOISE,
+    GRAIDENT_NOISE,
+    DLA_NOISE
+};
+
 class ImprovedDLATerrainGenerator {
 public:
     ImprovedDLATerrainGenerator(int seed = 134137)
@@ -268,8 +274,10 @@ private:
         }
     }
 };
-class PerlinNoise : public Scene_Base
-{
+
+
+
+class PerlinNoise : public Scene_Base {
 public:
     PerlinNoise(Scene_Manager& sceneManager, const std::string& name)
         : _sceneManager(sceneManager), _name(name), elapsedTime(0.0f),
@@ -295,7 +303,7 @@ public:
     virtual void draw() override;
     virtual void cleanup() override;
 
-    void control(double dt);
+    void control(float dt);
     void gui();
 
     // sub guis
@@ -416,12 +424,14 @@ private:
     void GeneratePerlinNoiseWithGradient();
     void GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData, std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
     glm::vec2 CalculateGradient(int x, int z, int width, int depth, const std::vector<float>& noise);
+    
+    
     void GenerateDLATerrain();
 	void GenerateDLATerrainMesh(std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
 	void ResizeTerrain(std::vector<float>& terrain, int width, int depth);
 
     // Regenerate
-    void RegeneratePerlinNoise();
+    void RegenerateNoise();
 
     // DLA Generaor
     bool useDLA;

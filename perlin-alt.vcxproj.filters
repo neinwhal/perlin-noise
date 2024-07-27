@@ -26,11 +26,11 @@
     <Filter Include="Source Files\Graphics\Window">
       <UniqueIdentifier>{d1da5467-d6fa-41d1-b9ca-d3c157a4d74e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Perlin">
-      <UniqueIdentifier>{aa57c1eb-fdc4-4fba-b052-a3cb37f86681}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Shaders">
       <UniqueIdentifier>{47404435-736a-4f97-9450-a071d46f0329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Terrain">
+      <UniqueIdentifier>{aa57c1eb-fdc4-4fba-b052-a3cb37f86681}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -43,17 +43,8 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PerlinNoise.cpp">
-      <Filter>Source Files\Perlin</Filter>
-    </ClCompile>
     <ClCompile Include="src\shader.cpp">
       <Filter>Source Files\Graphics\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PerlinGui.cpp">
-      <Filter>Source Files\Perlin</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PerlinControl.cpp">
-      <Filter>Source Files\Perlin</Filter>
     </ClCompile>
     <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_impl_glfw.cpp">
       <Filter>ImGui</Filter>
@@ -76,6 +67,24 @@
     <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_draw.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="src\DLANoise.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NoiseControl.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NoiseGui.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\NoiseVisual.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerlinGradient.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerlinNoise.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h">
@@ -89,9 +98,6 @@
     </ClInclude>
     <ClInclude Include="src\glhelper.h">
       <Filter>Source Files\Graphics\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PerlinNoise.hpp">
-      <Filter>Source Files\Perlin</Filter>
     </ClInclude>
     <ClInclude Include="src\shader.hpp">
       <Filter>Source Files\Graphics\Shader</Filter>
@@ -125,6 +131,9 @@
     </ClInclude>
     <ClInclude Include="src\camera.hpp">
       <Filter>Source Files\Graphics\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Noise.hpp">
+      <Filter>Source Files\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

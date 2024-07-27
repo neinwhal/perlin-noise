@@ -1,5 +1,5 @@
 
-#include "PerlinNoise.hpp"
+#include "Noise.hpp"
 
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_glfw.h>
@@ -17,6 +17,7 @@ void PerlinNoise::gui() {
     gui_terrain_visualization();
 }
 
+// Various Settings
 void PerlinNoise::gui_settings() {
     ImGui::Begin("Scene Settings");
     const char* visual_text[3] = { "Planes", "Lines", "Points" };
@@ -38,7 +39,7 @@ void PerlinNoise::gui_settings() {
 void PerlinNoise::gui_terrain_gen_controls() {
     ImGui::Begin("Terrain Generation Controls");
     if (ImGui::Checkbox("Use DLA Terrain", &useDLA)) {
-        RegeneratePerlinNoise();
+        RegenerateNoise();
     }
 
     if (useDLA) {
@@ -54,7 +55,7 @@ void PerlinNoise::gui_terrain_gen_controls() {
         dlaParamsChanged |= ImGui::SliderFloat("Height Multiplier", &heightMultiplier, 0.1f, 5.0f, "%.2f");
 
         if (dlaParamsChanged) {
-            RegeneratePerlinNoise();
+            RegenerateNoise();
         }
     }
     else {
@@ -64,7 +65,7 @@ void PerlinNoise::gui_terrain_gen_controls() {
             ImGui::SliderFloat("Gradient Factor", &gradientFactor, 0.0f, 30.0f, "%.2f") ||
             ImGui::SliderFloat("Persistence", &persistence, 0.1f, 1.0f, "%.2f"))
         {
-            RegeneratePerlinNoise();
+            RegenerateNoise();
         }
     }
 
@@ -72,7 +73,7 @@ void PerlinNoise::gui_terrain_gen_controls() {
         if (!useDLA) {
             InitializePermutationVector();
         }
-        RegeneratePerlinNoise();
+        RegenerateNoise();
     }
     ImGui::End();
 }

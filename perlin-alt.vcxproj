@@ -143,7 +143,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>x64;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
@@ -170,11 +170,13 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui-1.90.8\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\DLANoise.cpp" />
     <ClCompile Include="src\glhelper.cpp" />
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\PerlinControl.cpp" />
-    <ClCompile Include="src\PerlinGui.cpp" />
+    <ClCompile Include="src\NoiseControl.cpp" />
+    <ClCompile Include="src\NoiseGui.cpp" />
+    <ClCompile Include="src\NoiseVisual.cpp" />
     <ClCompile Include="src\PerlinNoise.cpp" />
     <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
@@ -193,7 +195,7 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClInclude Include="src\glhelper.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\KeyCodes.h" />
-    <ClInclude Include="src\PerlinNoise.hpp" />
+    <ClInclude Include="src\Noise.hpp" />
     <ClInclude Include="src\shader.hpp" />
   </ItemGroup>
   <ItemGroup>

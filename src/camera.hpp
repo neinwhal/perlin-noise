@@ -144,7 +144,7 @@ public:
         }
     }
 
-    void on_move(int offset, double dt) {
+    void on_move(int offset, float dt) {
         // offset
         // -1 / 1 = backward / forward
         // 2 / 3 = left /  right
