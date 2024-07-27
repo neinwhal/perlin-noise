@@ -78,8 +78,8 @@ std::vector<float> flatten2DVector(const std::vector<std::vector<float>>& vec2D)
 // Visualization
 void PerlinNoise::gui_terrain_visualization() {
     ImGui::Begin("Terrain Visualization");
-    ImVec2 previewSize(static_cast<float>(outputWidth), static_cast<float>(outputDepth));
-    ImGui::Text(useDLA ? "DLA Terrain Preview" : "Perlin Noise Preview");
+    ImVec2 previewSize(static_cast<float>(500), static_cast<float>(500));
+    ImGui::Text("Perlin Noise Preview");
 
     static GLuint terrainTextureID = 0;
     if (terrainTextureID == 0) {
@@ -91,7 +91,7 @@ void PerlinNoise::gui_terrain_visualization() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    std::vector<unsigned char> terrainData(outputWidth * outputDepth * 4); // x4 to accomodate RGBA
+    std::vector<unsigned char> terrainData(outputWidth * outputDepth * 4); // x4 to accommodate RGBA
     const std::vector<float>& sourceData = perlinNoise;
     for (int i = 0; i < outputWidth * outputDepth; ++i) {
         unsigned char value = static_cast<unsigned char>(sourceData[i] * 255.0f);
@@ -107,14 +107,13 @@ void PerlinNoise::gui_terrain_visualization() {
     ImGui::Image((void*)(intptr_t)terrainTextureID, previewSize);
     ImGui::End();
 
-
     ImGui::Begin("Terrain TEST");
 
-    if (ImGui::Button("aidnwuiduiadwia")) {
-        PerlinNoise::GenerateDLATerrain(1);
+    if (ImGui::Button("Generate Next Stage")) {
+        GenerateDLATerrain(1);
     }
 
-    ImVec2 previewTest(1000, 1000);
+    ImVec2 previewTest(500, 500);
     static GLuint terrainTextureID_2 = 1;
     if (terrainTextureID_2 == 1) {
         glGenTextures(1, &terrainTextureID_2);
@@ -126,19 +125,19 @@ void PerlinNoise::gui_terrain_visualization() {
     }
 
     std::vector<float> flat_dlaData = flatten2DVector(dlaData);
-    std::vector<unsigned char> terrainData_2(flat_dlaData.size() * 4); // x4 to accomodate RGBA
-    const std::vector<float>& dlaData_cc = flat_dlaData;
+    std::vector<unsigned char> terrainData_2(flat_dlaData.size() * 4); // x4 to accommodate RGBA
+
     for (int i = 0; i < flat_dlaData.size(); ++i) {
-        unsigned char value = static_cast<unsigned char>(dlaData_cc[i] * 255.0f);
-        terrainData[i * 4 + 0] = value; // R
-        terrainData[i * 4 + 1] = value; // R
-        terrainData[i * 4 + 2] = value; // R
-        terrainData[i * 4 + 3] = 255;   // A (fully opaque)
+        unsigned char value = static_cast<unsigned char>(flat_dlaData[i] * 255.0f);
+        terrainData_2[i * 4 + 0] = value; // R
+        terrainData_2[i * 4 + 1] = value; // G
+        terrainData_2[i * 4 + 2] = value; // B
+        terrainData_2[i * 4 + 3] = 255;   // A (fully opaque)
     }
 
     glBindTexture(GL_TEXTURE_2D, terrainTextureID_2);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(dlaData[0].size()), static_cast<GLsizei>(dlaData.size()), 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData.data());
-    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(dlaData[0].size()), static_cast<GLsizei>(dlaData.size()), 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData_2.data());
+
     ImGui::Image((void*)(intptr_t)terrainTextureID_2, previewTest);
     ImGui::End();
 }
