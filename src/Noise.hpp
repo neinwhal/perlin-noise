@@ -79,7 +79,8 @@ private:
 
     // DLA Noise Stuff
     struct dlaNode {
-        int x, y;
+        float x, y;
+        float parent_x, parent_y;
     };
 
     std::vector<std::vector<float>> dlaData;
@@ -173,7 +174,7 @@ private:
     glm::vec2 CalculateGradient(int x, int z, int width, int depth, const std::vector<float>& noise);
     
     
-    void GenerateDLATerrain();
+    void GenerateDLATerrain(int stage);
     bool useDLA;
 
     // Regenerate

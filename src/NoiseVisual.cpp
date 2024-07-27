@@ -26,7 +26,7 @@ void PerlinNoise::init() {
     GeneratePerlinNoise();
     GeneratePerlinNoiseWithGradient();
 
-    GenerateDLATerrain();
+    GenerateDLATerrain(0);
 
     // Generate terrain for both planes
     GeneratePerlinNoiseTerrain(perlinNoise, vertices[PERLIN_NOISE], indices[PERLIN_NOISE]);
