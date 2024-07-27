@@ -1,6 +1,8 @@
 #include "Noise.hpp"
 #include "random.hpp"
 
+#include <queue>
+
 int getCenterIndex(int gridSize, int quadrantIndex) {
 	int halfSize = gridSize / 2;
 
@@ -70,22 +72,28 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
     if (stage == 0) {
         // Start with initial size
         dlaData.clear();
+        dlaData_depth.clear();
+
         dlaList.clear();
 
         int initial_size{ 8 };
         // Populate 8 * 8 for first DLA
         dlaData.resize(initial_size, std::vector<float>(initial_size, 0.f));
+        dlaData_depth.resize(initial_size, std::vector<float>(initial_size, 0.f));
 
         int upper_mid = initial_size / 2;
         int lower_mid = upper_mid - 1;
         int random_center_x = random::rand(lower_mid, upper_mid);
         int random_center_y = random::rand(lower_mid, upper_mid);
+
         dlaData[random_center_x][random_center_y] = 1.f;
+        dlaData_depth[random_center_x][random_center_y] = 1.f;
         dlaList.push_back({
             get_squeezed_pos(random_center_x, dlaData[0].size()),
             get_squeezed_pos(random_center_y, dlaData.size()),
-            -1.f, -1.f
-            });
+            -1.f, -1.f, 1.f
+        });
+        dlaList_max_depth = 1.f;
 
         while (dlaList.size() < ((dlaData.size() * dlaData[0].size()) / 12)) {
             // Add a random dot
@@ -99,6 +107,7 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
 
             bool attached = false;
             float neighbour_x = -1, neighbour_y = -1;
+            float neighbour_depth = -1.f;
 
             while (!attached) {
                 // Move dot in random direction
@@ -120,31 +129,41 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
                 if (dot_location_x > 0 && dlaData[dot_location_x - 1][dot_location_y] > 0.f) {
                     neighbour_x = get_squeezed_pos(dot_location_x - 1, dlaData[0].size());
                     neighbour_y = get_squeezed_pos(dot_location_y, dlaData.size());
+                    neighbour_depth = dlaData_depth[dot_location_x - 1][dot_location_y];
                     attached = true;
                 }
                 else if (dot_location_x < dlaData[0].size() - 1 && dlaData[dot_location_x + 1][dot_location_y] > 0.f) {
                     neighbour_x = get_squeezed_pos(dot_location_x + 1, dlaData[0].size());
                     neighbour_y = get_squeezed_pos(dot_location_y, dlaData.size());
+                    neighbour_depth = dlaData_depth[dot_location_x + 1][dot_location_y];
                     attached = true;
                 }
                 else if (dot_location_y > 0 && dlaData[dot_location_x][dot_location_y - 1] > 0.f) {
                     neighbour_x = get_squeezed_pos(dot_location_x, dlaData[0].size());
                     neighbour_y = get_squeezed_pos(dot_location_y - 1, dlaData.size());
+                    neighbour_depth = dlaData_depth[dot_location_x][dot_location_y - 1];
                     attached = true;
                 }
                 else if (dot_location_y < dlaData.size() - 1 && dlaData[dot_location_x][dot_location_y + 1] > 0.f) {
                     neighbour_x = get_squeezed_pos(dot_location_x, dlaData[0].size());
                     neighbour_y = get_squeezed_pos(dot_location_y + 1, dlaData.size());
+                    neighbour_depth = dlaData_depth[dot_location_x][dot_location_y + 1];
                     attached = true;
                 }
             }
 
             dlaData[dot_location_x][dot_location_y] = 1.f;
+            dlaData_depth[dot_location_x][dot_location_y] = neighbour_depth + 1.f;
+
             dlaList.push_back({
                 get_squeezed_pos(dot_location_x, dlaData[0].size()),
                 get_squeezed_pos(dot_location_y, dlaData.size()),
-                neighbour_x, neighbour_y
+                neighbour_x, neighbour_y, (neighbour_depth + 1.f)
             });
+
+            if ((neighbour_depth + 1.f) > dlaList_max_depth) {
+                dlaList_max_depth = neighbour_depth + 1.f;
+            }
         }
         blurry_dlaData = dlaData;
     }
@@ -195,15 +214,20 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
             }
         }
         blurry_dlaData = new_blurry_dlaData;
-        
+
         // CRISP upscale
         dlaData.clear();
+        dlaData_depth.clear();
         dlaData.resize(new_size, std::vector<float>(new_size, 0.f));
+        dlaData_depth.resize(new_size, std::vector<float>(new_size, 0.f));
+        
 
         // Populate the new vector with old data
         for (const auto& node : dlaList) {
             int new_x = static_cast<int>(node.x * (new_size - 1));
             int new_y = static_cast<int>(node.y * (new_size - 1));
+
+            dlaData_depth[new_x][new_y] = node.depth;
 
             // Fill the path between (new_x, new_y) and (parent_x, parent_y)
             if (node.parent_x < 0.f || node.parent_y < 0.f) continue;
@@ -237,7 +261,8 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
         }
 
         // Continue to populate the map with additional dots
-        size_t target_size = ((dlaData.size() * dlaData[0].size()) / static_cast<size_t>(3 * std::sqrt(new_size))); // Adjusted based on size
+        //size_t target_size = ((dlaData.size() * dlaData[0].size()) / static_cast<size_t>(3 * std::sqrt(new_size))); // Adjusted based on size
+        size_t target_size = (static_cast<float>(dlaData.size() * dlaData[0].size()) / static_cast<float>(4.f)); // Adjusted based on size
         while (dlaList.size() < target_size) {
             // Add a random dot
             bool populated = true;
@@ -250,6 +275,7 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
 
             bool attached = false;
             float neighbour_x = -1, neighbour_y = -1;
+            float neighbour_depth = -1.f;
 
             while (!attached) {
                 // Move dot in random direction
@@ -271,41 +297,63 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
                 if (dot_location_x > 0 && dlaData[dot_location_x - 1][dot_location_y] > 0.f) {
                     neighbour_x = get_squeezed_pos(dot_location_x - 1, dlaData[0].size());
                     neighbour_y = get_squeezed_pos(dot_location_y, dlaData.size());
+                    neighbour_depth = dlaData_depth[dot_location_x - 1][dot_location_y];
                     attached = true;
                 }
                 else if (dot_location_x < dlaData[0].size() - 1 && dlaData[dot_location_x + 1][dot_location_y] > 0.f) {
                     neighbour_x = get_squeezed_pos(dot_location_x + 1, dlaData[0].size());
                     neighbour_y = get_squeezed_pos(dot_location_y, dlaData.size());
+                    neighbour_depth = dlaData_depth[dot_location_x + 1][dot_location_y];
                     attached = true;
                 }
                 else if (dot_location_y > 0 && dlaData[dot_location_x][dot_location_y - 1] > 0.f) {
                     neighbour_x = get_squeezed_pos(dot_location_x, dlaData[0].size());
                     neighbour_y = get_squeezed_pos(dot_location_y - 1, dlaData.size());
+                    neighbour_depth = dlaData_depth[dot_location_x][dot_location_y - 1];
                     attached = true;
                 }
                 else if (dot_location_y < dlaData.size() - 1 && dlaData[dot_location_x][dot_location_y + 1] > 0.f) {
                     neighbour_x = get_squeezed_pos(dot_location_x, dlaData[0].size());
                     neighbour_y = get_squeezed_pos(dot_location_y + 1, dlaData.size());
+                    neighbour_depth = dlaData_depth[dot_location_x][dot_location_y + 1];
                     attached = true;
                 }
             }
 
             dlaData[dot_location_x][dot_location_y] = 1.f;
+            dlaData_depth[dot_location_x][dot_location_y] = neighbour_depth + 1.f;
             dlaList.push_back({
                 get_squeezed_pos(dot_location_x, dlaData[0].size()),
                 get_squeezed_pos(dot_location_y, dlaData.size()),
-                neighbour_x, neighbour_y
-                });
+                neighbour_x, neighbour_y, neighbour_depth + 1.f
+            });
+            if ((neighbour_depth + 1.f) > dlaList_max_depth) {
+                dlaList_max_depth = neighbour_depth + 1.f;
+            }
+        }
+
+        std::vector<std::vector<float>> weighted_dlaData;
+        weighted_dlaData.clear();
+        weighted_dlaData.resize(dlaData.size(), std::vector<float>(dlaData.size(), 0.f));
+
+        for (size_t i = 0; i < weighted_dlaData.size(); ++i) {
+            for (size_t j = 0; j < weighted_dlaData[0].size(); ++j) {
+                if (dlaData_depth[i][j] > 0.f) {
+                    float height = (dlaList_max_depth + 1.f) - dlaData_depth[i][j];
+                    float relative_height = 1.f - (1.f / (1.f + height));
+                    weighted_dlaData[i][j] = relative_height;
+                }
+            }
         }
 
         for (size_t i = 0; i < dlaData.size(); ++i) {
             for (size_t j = 0; j < dlaData[0].size(); ++j) {
-                blurry_dlaData[i][j] += dlaData[i][j];
+                blurry_dlaData[i][j] += weighted_dlaData[i][j];
             }
         }
-        blurry_dlaData = simpleAverageConvolution(blurry_dlaData);
 
-        //for 
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+        blurry_dlaData = simpleAverageConvolution(blurry_dlaData);
     }
 }
 

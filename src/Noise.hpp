@@ -112,11 +112,16 @@ private:
     struct dlaNode {
         float x, y;
         float parent_x, parent_y;
+        float depth;
     };
+    float dlaList_max_depth;
 
     std::vector<std::vector<float>> dlaData;
+    std::vector<std::vector<float>> dlaData_depth;
     std::vector<std::vector<float>> blurry_dlaData;
 	std::vector<float> flat_blurry_dlaData;
+
+    std::vector<std::vector<float>> mountData;
     std::vector<dlaNode> dlaList;
 
     // Perlin Noise functions

@@ -121,6 +121,15 @@ void PerlinNoise::draw() {
 
     // Draw both noise terrains
     if (useDLA) {
+        M = glm::mat4(1.0f);
+
+        M = glm::translate(M, glm::vec3(0.0f, 0.0f, 0.0f));
+        M = glm::scale(M, glm::vec3{ 20.f, 20.f, 20.f });
+
+
+        MV = VP * M;
+        mvp = PP * MV;
+        glUniformMatrix4fv(uniform_mvpMatrix, 1, GL_FALSE, glm::value_ptr(mvp));
         glBindVertexArray(vao[DLA_NOISE]);
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices[DLA_NOISE].size()), GL_UNSIGNED_INT, 0);
     }

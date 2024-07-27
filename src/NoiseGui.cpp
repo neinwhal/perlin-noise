@@ -182,5 +182,46 @@ void PerlinNoise::gui_terrain_visualization() {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(blurry_dlaData[0].size()), static_cast<GLsizei>(blurry_dlaData.size()), 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData_3.data());
 
     ImGui::Image((void*)(intptr_t)terrainTextureID_3, blurry_DLA_preview);
+
+
+    // mountain DLA image
+    if (!mountData.empty()) {
+        ImVec2 mount_DLA_preview(500, 500);
+        static GLuint terrainTextureID_4 = 3;
+        if (terrainTextureID_4 == 3) {
+            glGenTextures(1, &terrainTextureID_4);
+            glBindTexture(GL_TEXTURE_2D, terrainTextureID_4);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        }
+
+        std::vector<float> flat_mountData = flatten2DVector(mountData);
+        std::vector<unsigned char> terrainData_4(flat_mountData.size() * 4); // x4 to accommodate RGBA
+
+        float max_value_m = *std::max_element(flat_mountData.begin(), flat_mountData.end());
+        if (max_value_m > 0.f) {
+            for (auto& value : flat_mountData) {
+                value /= max_value_m;
+            }
+        }
+
+        for (int i = 0; i < flat_mountData.size(); ++i) {
+            unsigned char value = static_cast<unsigned char>(std::min(flat_mountData[i] * 255.0f, 255.0f));
+            terrainData_4[i * 4 + 0] = value; // R
+            terrainData_4[i * 4 + 1] = value; // G
+            terrainData_4[i * 4 + 2] = value; // B
+            terrainData_4[i * 4 + 3] = 255;   // A (fully opaque)
+        }
+
+        glBindTexture(GL_TEXTURE_2D, terrainTextureID_4);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, static_cast<GLsizei>(mountData[0].size()), static_cast<GLsizei>(mountData.size()), 0, GL_RGBA, GL_UNSIGNED_BYTE, terrainData_4.data());
+
+        ImGui::Image((void*)(intptr_t)terrainTextureID_4, mount_DLA_preview);
+    }
+
     ImGui::End();
+
+    // mountain DLA image
 }
