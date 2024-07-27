@@ -17,10 +17,13 @@
 #include <cmath>
 #include <algorithm>
 #include <iostream>
+#define M_PI 3.14159265358979323846
 
 enum terrain_types {
-    PERLIN_NOISE,
-    GRAIDENT_NOISE,
+	PERLIN_NOISE, // 0
+	GRAIDENT_NOISE, // 1
+    ALT_PERLIN_NOISE, // 2
+    ALT_GRAIDENT_NOISE, // 3
     DLA_NOISE
 };
 
@@ -32,8 +35,10 @@ public:
         outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.07f),
         gradientFactor(5.03f), useDLA(false)
     {
-        perlinNoise.resize(outputWidth * outputDepth);
+		perlinNoise.resize(outputWidth * outputDepth);
+        altPerlinNoise.resize(outputWidth * outputDepth);
         perlinNoiseWithGradient.resize(outputWidth * outputDepth);
+		altPerlinNoiseWithGradient.resize(outputWidth * outputDepth);
         InitializePermutationVector();
     }
     virtual void load() override;
@@ -50,7 +55,30 @@ public:
     void gui_terrain_visualization();
     void gui_settings();
 
+   
 
+    float GenerateNoise(float x, float y, int outputWidth, int outputDepth, int octaves = 8) {
+        float value = 0.0f;
+        float amplitude = 1.0f;
+        float frequency = 1.0f;
+        float maxValue = 0.0f;
+
+        for (int i = 0; i < octaves; ++i) {
+            value += perlin(x * frequency, y * frequency) * amplitude;
+            maxValue += amplitude;
+            amplitude *= 0.5f;
+            frequency *= 2.0f;
+        }
+
+        // Normalize and scale the result
+        value = value / maxValue;
+
+        // Optional: Adjust the contrast
+        value = (value * 2.0f) - 1.0f;  // Map to [-1, 1]
+        value = (std::sin(value * M_PI * 0.5f) + 1.0f) * 0.5f;  // Smooth curve and remap to [0, 1]
+
+        return value;
+    }
 
 private:
     struct Vertex {
@@ -69,8 +97,11 @@ private:
 
     // Perlin Noise Stuff
     int outputWidth, outputDepth;
-    std::vector<float> perlinNoise;
-    std::vector<float> perlinNoiseWithGradient;
+	std::vector<float> perlinNoise;
+	std::vector<float> perlinNoiseWithGradient;
+
+    std::vector<float> altPerlinNoise;
+    std::vector<float> altPerlinNoiseWithGradient;
     int octaveCount;
     float persistence;
     float heightMultiplier;
@@ -170,8 +201,56 @@ private:
         return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
     }
 
-    void GeneratePerlinNoise();
-    void GeneratePerlinNoiseWithGradient();
+     // Proper Perlin Noise
+     struct Vector2 {
+         float x, y;
+     };
+
+     float perlin(float x, float y) {
+         int x0 = static_cast<int>(std::floor(x));
+         int y0 = static_cast<int>(std::floor(y));
+         int x1 = x0 + 1;
+         int y1 = y0 + 1;
+
+         float sx = smoothstep(x - static_cast<float>(x0));
+         float sy = smoothstep(y - static_cast<float>(y0));
+
+         float n0 = dotGridGradient(x0, y0, x, y);
+         float n1 = dotGridGradient(x1, y0, x, y);
+         float ix0 = std::lerp(n0, n1, sx);
+
+         n0 = dotGridGradient(x0, y1, x, y);
+         n1 = dotGridGradient(x1, y1, x, y);
+         float ix1 = std::lerp(n0, n1, sx);
+
+         return std::lerp(ix0, ix1, sy);
+     }
+     static Vector2 randomGradient(int ix, int iy) {
+         const unsigned w = 8 * sizeof(unsigned);
+         const unsigned s = w / 2;
+         unsigned a = ix, b = iy;
+         a *= 3284157443; b ^= a << s | a >> w - s;
+         b *= 1911520717; a ^= b << s | b >> w - s;
+         a *= 2048419325;
+         float random = a * (3.14159265f / ~(~0u >> 1));
+         return { std::cos(random), std::sin(random) };
+     }
+
+     float dotGridGradient(int ix, int iy, float x, float y) {
+         Vector2 gradient = randomGradient(p[(p[ix & 255] + iy) & 255], p[(p[ix & 255] + iy + 1) & 255]);
+         float dx = x - static_cast<float>(ix);
+         float dy = y - static_cast<float>(iy);
+         return (dx * gradient.x + dy * gradient.y);
+     }
+
+     static float smoothstep(float t) {
+         return t * t * (3 - 2 * t);
+     }
+
+	void GeneratePerlinNoise();
+	void GeneratePerlindNoiseWithGradient();
+    void GenerateAltPerlinNoise();
+    void GenerateAltPerlinNoiseWithGradient();
     void GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData, std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
     glm::vec2 CalculateGradient(int x, int z, int width, int depth, const std::vector<float>& noise);
     
@@ -183,7 +262,7 @@ private:
     void RegenerateNoise();
 
     // Buffer Stuff - for perlin noise plane and the perlin noise + gradient plane
-    GLuint vao[3]{}, vbo[3]{}, ebo[3]{};
-    std::vector<Vertex> vertices[3];
-    std::vector<unsigned int> indices[3];
+    GLuint vao[5]{}, vbo[5]{}, ebo[5]{};
+    std::vector<Vertex> vertices[5];
+    std::vector<unsigned int> indices[5];
 };

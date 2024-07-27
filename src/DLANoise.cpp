@@ -330,7 +330,6 @@ void PerlinNoise::GenerateTerrainDLA() {
 
     float waterLevel = 0.35f;
 
-    // Find the min and max heights in the data for better normalization
     float dataMin = *std::min_element(flat_blurry_dlaData.begin(), flat_blurry_dlaData.end());
     float dataMax = *std::max_element(flat_blurry_dlaData.begin(), flat_blurry_dlaData.end());
 

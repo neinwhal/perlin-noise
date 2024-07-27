@@ -49,7 +49,7 @@ void PerlinNoise::gui_terrain_gen_controls() {
     // Separate sections for DLA and Perlin controls
     if (useDLA) {
         ImGui::Text("DLA Terrain Settings");
-        // Add whatever DLA shit here. 
+        // Add whatever DLA settings shit here. 
     }
     else {
         ImGui::Text("Perlin Noise Settings");
@@ -102,7 +102,7 @@ void PerlinNoise::gui_terrain_visualization() {
     }
 
     std::vector<unsigned char> terrainData(outputWidth * outputDepth * 4); // x4 to accommodate RGBA
-    const std::vector<float>& sourceData = perlinNoise;
+    const std::vector<float>& sourceData = altPerlinNoise;
     for (int i = 0; i < outputWidth * outputDepth; ++i) {
         unsigned char value = static_cast<unsigned char>(sourceData[i] * 255.0f);
         terrainData[i * 4 + 0] = value; // R

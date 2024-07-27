@@ -295,7 +295,7 @@ float PerlinNoise::OctaveNoise(float x, float y, float z, int octaves, float per
  *   0.52, 0.63, 0.73, 0.62,
  *   0.50, 0.60, 0.68, 0.57 ]
  */
-void PerlinNoise::GeneratePerlinNoise() {
+void PerlinNoise::GenerateAltPerlinNoise() {
     // Loop through each pixel in the output grid
     for (int y = 0; y < outputDepth; y++) {
         for (int x = 0; x < outputWidth; x++) {
@@ -308,7 +308,19 @@ void PerlinNoise::GeneratePerlinNoise() {
 
             // Clamp the noise value to the range [0, 1] and store it in the output array
             value = std::max(0.0f, std::min(1.0f, (value + 1.0f) * 0.5f));
-            perlinNoise[y * outputWidth + x] = value;
+            altPerlinNoise[y * outputWidth + x] = value;
+        }
+    }
+}
+
+void PerlinNoise::GeneratePerlinNoise() {
+    perlinNoise.resize(outputWidth * outputDepth);
+    for (int y = 0; y < outputDepth; ++y) {
+        for (int x = 0; x < outputWidth; ++x) {
+            float nx = static_cast<float>(x) / outputWidth;
+            float ny = static_cast<float>(y) / outputDepth;
+            float noise = GenerateNoise(nx * 4.0f, ny * 4.0f, outputWidth, outputDepth, 6);
+            perlinNoise[y * outputWidth + x] = noise;
         }
     }
 }
