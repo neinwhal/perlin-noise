@@ -179,6 +179,7 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClCompile Include="src\NoiseGui.cpp" />
     <ClCompile Include="src\NoiseVisual.cpp" />
     <ClCompile Include="src\PerlinNoise.cpp" />
+    <ClCompile Include="src\random.cpp" />
     <ClCompile Include="src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +198,7 @@ xcopy "$(SolutionDir)shaders" "$(TargetDir)shaders" /E /I /Y</Command>
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\KeyCodes.h" />
     <ClInclude Include="src\Noise.hpp" />
+    <ClInclude Include="src\random.hpp" />
     <ClInclude Include="src\shader.hpp" />
   </ItemGroup>
   <ItemGroup>

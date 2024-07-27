@@ -85,6 +85,9 @@
     <ClCompile Include="src\GradientNoise.cpp">
       <Filter>Source Files\Terrain</Filter>
     </ClCompile>
+    <ClCompile Include="src\random.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h">
@@ -134,6 +137,9 @@
     </ClInclude>
     <ClInclude Include="src\Noise.hpp">
       <Filter>Source Files\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="src\random.hpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

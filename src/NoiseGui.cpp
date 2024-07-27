@@ -65,6 +65,16 @@ void PerlinNoise::gui_terrain_gen_controls() {
     ImGui::End();
 }
 
+std::vector<float> flatten2DVector(const std::vector<std::vector<float>>& vec2D) {
+    std::vector<float> vec1D;
+    for (const auto& row : vec2D) {
+        for (float value : row) {
+            vec1D.push_back(value);
+        }
+    }
+    return vec1D;
+}
+
 // Visualization
 void PerlinNoise::gui_terrain_visualization() {
     ImGui::Begin("Terrain Visualization");
@@ -113,9 +123,11 @@ void PerlinNoise::gui_terrain_visualization() {
     }
 
     std::vector<unsigned char> terrainData_2(dla_hardcoded_max_size * dla_hardcoded_max_size * 4); // x4 to accomodate RGBA
-    const std::vector<float>& dlaData = dlaNoise;
+    
+    std::vector<float> flat_dlaData = flatten2DVector(dlaData);
+    const std::vector<float>& dlaData_cc = flat_dlaData;
     for (int i = 0; i < dla_hardcoded_max_size * dla_hardcoded_max_size; ++i) {
-        unsigned char value = static_cast<unsigned char>(dlaData[i] * 255.0f);
+        unsigned char value = static_cast<unsigned char>(dlaData_cc[i] * 255.0f);
         terrainData[i * 4 + 0] = value; // R
         terrainData[i * 4 + 1] = value; // R
         terrainData[i * 4 + 2] = value; // R
