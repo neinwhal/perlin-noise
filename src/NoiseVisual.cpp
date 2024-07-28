@@ -197,9 +197,6 @@ void PerlinNoise::cleanup() {
 }
 
 void PerlinNoise::RegenerateNoise() {
- /*   if (terrain_gen_type != 2)
-        InitializePermutationVector();*/
-
     if (terrain_gen_type == 2) { // DLA
         GenerateDLATerrain(0);
         GenerateTerrainDLA();

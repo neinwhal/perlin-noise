@@ -22,8 +22,6 @@ int getCenterIndex(int gridSize, int quadrantIndex) {
 
 float get_squeezed_pos(int pos, size_t size) {
     return static_cast<float>(pos) / static_cast<float>(size - 1);
-    //float ratio = static_cast<float>(pos) / static_cast<float>(size - 1);
-    //return 0.1f + 0.8f * ratio; // Squeeze towards the center
 }
 
 // Function to perform convolution on a 2D vector with a simple averaging kernel
@@ -269,7 +267,6 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
 
         // Continue to populate the map with additional dots
         size_t target_size = ((dlaData.size() * dlaData[0].size()) / static_cast<size_t>(std::sqrt(new_size))); // Adjusted based on size
-        //size_t target_size = (static_cast<float>(dlaData.size() * dlaData[0].size()) / static_cast<float>(4.f)); // Adjusted based on size
         while (dlaList.size() < target_size) {
             // Add a random dot
             bool populated = true;
@@ -359,7 +356,6 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
             }
         }
 
-        //////////////////////////////////////////////////////////////////////////////////////////////////////
         blurry_dlaData = simpleAverageConvolution(blurry_dlaData);
     
         dlaLevel++;

@@ -75,7 +75,7 @@ public:
 
         // Optional: Adjust the contrast
         value = (value * 2.0f) - 1.0f;  // Map to [-1, 1]
-        value = (std::sin(value * M_PI * 0.5f) + 1.0f) * 0.5f;  // Smooth curve and remap to [0, 1]
+        value = (std::sin(value * static_cast<float>(M_PI) * 0.5f) + 1.0f) * 0.5f;  // Smooth curve and remap to [0, 1]
 
         return value;
     }
@@ -239,8 +239,8 @@ private:
          const unsigned w = 8 * sizeof(unsigned);
          const unsigned s = w / 2;
          unsigned a = ix, b = iy;
-         a *= 3284157443; b ^= a << s | a >> w - s;
-         b *= 1911520717; a ^= b << s | b >> w - s;
+         a *= 3284157443; b ^= (a << s) | (a >> (w - s));
+         b *= 1911520717; a ^= (b << s) | (b >> (w - s));
          a *= 2048419325;
          float random = a * (3.14159265f / ~(~0u >> 1));
          return { std::cos(random), std::sin(random) };
