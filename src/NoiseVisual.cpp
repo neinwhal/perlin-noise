@@ -201,9 +201,8 @@ void PerlinNoise::RegenerateNoise() {
         InitializePermutationVector();
 
     if (terrain_gen_type == 2) { // DLA
-        GenerateDLATerrain(0);  
-        GenerateDLATerrain(1);  
-        GenerateTerrainDLA();  
+        GenerateDLATerrain(0);
+        GenerateTerrainDLA();
     }
     else if (terrain_gen_type == 1) { // with gradient
         GeneratePerlindNoiseWithGradient();

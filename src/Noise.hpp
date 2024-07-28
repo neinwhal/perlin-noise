@@ -33,7 +33,7 @@ public:
         : _sceneManager(sceneManager), _name(name), elapsedTime(0.0f),
         visualization_primitive(0), light_position(glm::vec3(5.f, 5.f, 5.f)),
         outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.07f),
-        gradientFactor(5.03f), terrain_gen_type(0)
+        gradientFactor(5.03f), dlaLevel(0), terrain_gen_type(0)
     {
 		perlinNoise.resize(outputWidth * outputDepth);
         altPerlinNoise.resize(outputWidth * outputDepth);
@@ -123,6 +123,8 @@ private:
     std::vector<std::vector<float>> dlaData_depth;
     std::vector<std::vector<float>> blurry_dlaData;
 	std::vector<float> flat_blurry_dlaData;
+
+    int dlaLevel;
 
     std::vector<std::vector<float>> mountData;
     std::vector<dlaNode> dlaList;

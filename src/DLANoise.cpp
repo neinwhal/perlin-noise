@@ -166,9 +166,16 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
             }
         }
         blurry_dlaData = dlaData;
+
+        dlaLevel = 1;
     }
 
     if (stage == 1) {
+
+        if (dlaLevel > 6) {
+            return;
+        }
+
         // Resize to a higher level
         size_t old_size = dlaData.size();
         size_t new_size = dlaData.size() * 2;
@@ -354,8 +361,11 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
 
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         blurry_dlaData = simpleAverageConvolution(blurry_dlaData);
+    
+        dlaLevel++;
     }
 
+    
     FlattenTerrainDLA();
 }
 
