@@ -33,6 +33,9 @@ void PerlinNoise::init() {
     GenerateAltPerlinNoiseWithGradient();
 
     GenerateDLATerrain(0);
+    GenerateDLATerrain(1);
+    GenerateDLATerrain(1);
+    GenerateDLATerrain(1);
 
     // Generate terrain 
     GeneratePerlinNoiseTerrain(perlinNoise, vertices[PERLIN_NOISE], indices[PERLIN_NOISE]);
@@ -40,6 +43,8 @@ void PerlinNoise::init() {
    
     GeneratePerlinNoiseTerrain(altPerlinNoise, vertices[ALT_PERLIN_NOISE], indices[ALT_PERLIN_NOISE]);
     GeneratePerlinNoiseTerrain(altPerlinNoiseWithGradient, vertices[ALT_GRAIDENT_NOISE], indices[ALT_GRAIDENT_NOISE]);
+
+    GenerateTerrainDLA();
 
     perlinNoise.reserve(outputWidth * outputDepth);
     perlinNoiseWithGradient.reserve(outputWidth * outputDepth);
@@ -192,8 +197,12 @@ void PerlinNoise::cleanup() {
 }
 
 void PerlinNoise::RegenerateNoise() {
+    if (terrain_gen_type != 2)
+        InitializePermutationVector();
+
     if (terrain_gen_type == 2) { // DLA
         GenerateDLATerrain(0);  
+        GenerateDLATerrain(1);  
         GenerateTerrainDLA();  
     }
     else if (terrain_gen_type == 1) { // with gradient
@@ -216,6 +225,7 @@ void PerlinNoise::RegenerateNoise() {
     int numTerrainTypes = (terrain_gen_type == 2) ? 1 : 2;
     for (int i = 0; i < numTerrainTypes; ++i) {
         int terrainType = (terrain_gen_type == 2) ? DLA_NOISE : i;
+        if (terrain_gen_type == 1) terrainType += 2;
         glBindBuffer(GL_ARRAY_BUFFER, vbo[terrainType]);
         glBufferData(GL_ARRAY_BUFFER, vertices[terrainType].size() * sizeof(Vertex), vertices[terrainType].data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[terrainType]);

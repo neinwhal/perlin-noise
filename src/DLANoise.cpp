@@ -355,12 +355,18 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         blurry_dlaData = simpleAverageConvolution(blurry_dlaData);
     }
+
+    FlattenTerrainDLA();
 }
 
+void PerlinNoise::FlattenTerrainDLA() {
+    flat_blurry_dlaData = flatten2DVector(blurry_dlaData);
+}
 
 void PerlinNoise::GenerateTerrainDLA() {
     // Calculate the correct size for a square grid
     int dlaSize = static_cast<int>(std::sqrt(flat_blurry_dlaData.size()));
+
     float minHeight = 0.0f;
     float maxHeight = 1.0f;
 

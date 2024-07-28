@@ -71,7 +71,7 @@ void PerlinNoise::gui_terrain_gen_controls() {
     ImGui::End();
 }
 
-std::vector<float> flatten2DVector(const std::vector<std::vector<float>>& vec2D) {
+std::vector<float> PerlinNoise::flatten2DVector(const std::vector<std::vector<float>>& vec2D) {
     std::vector<float> vec1D;
     for (const auto& row : vec2D) {
         for (float value : row) {
@@ -194,19 +194,18 @@ void PerlinNoise::gui_terrain_visualization() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
-
-    flat_blurry_dlaData = flatten2DVector(blurry_dlaData);
+    
     std::vector<unsigned char> terrainData_3(flat_blurry_dlaData.size() * 4); // x4 to accommodate RGBA
-
     float max_value = *std::max_element(flat_blurry_dlaData.begin(), flat_blurry_dlaData.end());
+    std::vector<float> image_flat_blurry_dlaData = flat_blurry_dlaData;
     if (max_value > 0.f) {
-        for (auto& value : flat_blurry_dlaData) {
+        for (auto& value : image_flat_blurry_dlaData) {
             value /= max_value;
         }
     }
 
-    for (int i = 0; i < flat_blurry_dlaData.size(); ++i) {
-        unsigned char value = static_cast<unsigned char>(std::min(flat_blurry_dlaData[i] * 255.0f, 255.0f));
+    for (int i = 0; i < image_flat_blurry_dlaData.size(); ++i) {
+        unsigned char value = static_cast<unsigned char>(std::min(image_flat_blurry_dlaData[i] * 255.0f, 255.0f));
         terrainData_3[i * 4 + 0] = value; // R
         terrainData_3[i * 4 + 1] = value; // G
         terrainData_3[i * 4 + 2] = value; // B

@@ -262,7 +262,9 @@ private:
     void GeneratePerlinNoiseTerrain(const std::vector<float>& noiseData, std::vector<Vertex>& outVertices, std::vector<unsigned int>& outIndices);
     glm::vec2 CalculateGradient(int x, int z, int width, int depth, const std::vector<float>& noise);
     
+    std::vector<float> flatten2DVector(const std::vector<std::vector<float>>& vec2D);
 	void GenerateTerrainDLA();
+    void FlattenTerrainDLA();
     void GenerateDLATerrain(int stage);
 
     // Regenerate
