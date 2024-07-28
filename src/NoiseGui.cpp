@@ -56,6 +56,7 @@ void PerlinNoise::gui_terrain_gen_controls() {
             RegenerateNoise();
         }
         if (ImGui::Button("Regenerate Terrain")) {
+            InitializePermutationVector();
             RegenerateNoise();
         }
     }
@@ -99,7 +100,7 @@ void PerlinNoise::gui_terrain_visualization() {
         ImGui::Begin("Perlin Noise Height Maps");
         ImVec2 previewSize(static_cast<float>(400), static_cast<float>(400));
 
-        ImGui::Text("Alternative Perlin Noise Height Map");
+        ImGui::Text("Perlin Noise Height Map");
         static GLuint terrainTextureID = 0;
         if (terrainTextureID == 0) {
             glGenTextures(1, &terrainTextureID);
