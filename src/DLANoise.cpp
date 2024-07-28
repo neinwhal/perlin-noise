@@ -261,8 +261,8 @@ void PerlinNoise::GenerateDLATerrain(int stage) {
         }
 
         // Continue to populate the map with additional dots
-        //size_t target_size = ((dlaData.size() * dlaData[0].size()) / static_cast<size_t>(3 * std::sqrt(new_size))); // Adjusted based on size
-        size_t target_size = (static_cast<float>(dlaData.size() * dlaData[0].size()) / static_cast<float>(4.f)); // Adjusted based on size
+        size_t target_size = ((dlaData.size() * dlaData[0].size()) / static_cast<size_t>(std::sqrt(new_size))); // Adjusted based on size
+        //size_t target_size = (static_cast<float>(dlaData.size() * dlaData[0].size()) / static_cast<float>(4.f)); // Adjusted based on size
         while (dlaList.size() < target_size) {
             // Add a random dot
             bool populated = true;

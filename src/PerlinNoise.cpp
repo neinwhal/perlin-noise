@@ -319,7 +319,7 @@ void PerlinNoise::GeneratePerlinNoise() {
         for (int x = 0; x < outputWidth; ++x) {
             float nx = static_cast<float>(x) / outputWidth;
             float ny = static_cast<float>(y) / outputDepth;
-            float noise = GenerateNoise(nx * 4.0f, ny * 4.0f, outputWidth, outputDepth, 6);
+            float noise = GenerateNoise(nx * 4.0f, ny * 4.0f, outputWidth, outputDepth, octaveCount);
             perlinNoise[y * outputWidth + x] = noise;
         }
     }

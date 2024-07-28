@@ -39,37 +39,33 @@ void PerlinNoise::gui_settings() {
 void PerlinNoise::gui_terrain_gen_controls() {
     ImGui::Begin("Terrain Generation Controls");
 
-    if (ImGui::Checkbox("Use DLA Terrain", &useDLA)) {
-        if (useDLA) {
-            GenerateDLATerrain(1);
-        }
-        RegenerateNoise();
-    }
+    const char* visual_text[3] = { "Perlin", "Perlin + Gradient", "DLA" };
+    ImGui::Combo("Terrain Generation", &terrain_gen_type, visual_text, 3);
 
-    // Separate sections for DLA and Perlin controls
-    if (useDLA) {
-        ImGui::Text("DLA Terrain Settings");
-        // Add whatever DLA settings shit here. 
-    }
-    else {
+    if (terrain_gen_type == 0 || terrain_gen_type == 1) {
+        // perlin noise and perlin + gradient
         ImGui::Text("Perlin Noise Settings");
         bool changed = false;
-        changed |= ImGui::SliderInt("Octave Count", &octaveCount, 1, 8);
+        changed |= ImGui::SliderInt("Octave Count", &octaveCount, 1, 10);
         changed |= ImGui::SliderFloat("Height Multiplier", &heightMultiplier, 0.1f, 5.0f, "%.2f");
         changed |= ImGui::SliderFloat("Gradient Factor", &gradientFactor, 0.0f, 30.0f, "%.2f");
         changed |= ImGui::SliderFloat("Persistence", &persistence, 0.1f, 1.0f, "%.2f");
-
         if (changed) {
             RegenerateNoise();
         }
-    }
-
-    // Regenerate button
-    if (ImGui::Button("Regenerate Terrain")) {
-        if (!useDLA) {
-            InitializePermutationVector();
+        if (ImGui::Button("Regenerate Terrain")) {
+            RegenerateNoise();
         }
-        RegenerateNoise();
+    }
+    else if (terrain_gen_type == 2) {
+        // DLA
+        ImGui::Text("DLA Settings");
+        if (ImGui::Button("Increase DLA Detail")) {
+            GenerateDLATerrain(1);
+        }
+        if (ImGui::Button("Regenerate Terrain")) {
+            GenerateDLATerrain(0);
+        }
     }
 
     ImGui::End();

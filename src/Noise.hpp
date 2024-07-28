@@ -21,8 +21,8 @@
 
 enum terrain_types {
 	PERLIN_NOISE, // 0
-	GRAIDENT_NOISE, // 1
-    ALT_PERLIN_NOISE, // 2
+    ALT_PERLIN_NOISE, // 1
+	GRAIDENT_NOISE, // 2
     ALT_GRAIDENT_NOISE, // 3
     DLA_NOISE
 };
@@ -33,7 +33,7 @@ public:
         : _sceneManager(sceneManager), _name(name), elapsedTime(0.0f),
         visualization_primitive(0), light_position(glm::vec3(5.f, 5.f, 5.f)),
         outputWidth(650), outputDepth(650), octaveCount(8), persistence(0.5f), heightMultiplier(0.07f),
-        gradientFactor(5.03f), useDLA(false)
+        gradientFactor(5.03f), terrain_gen_type(0)
     {
 		perlinNoise.resize(outputWidth * outputDepth);
         altPerlinNoise.resize(outputWidth * outputDepth);
@@ -86,13 +86,16 @@ private:
         glm::vec3 color;
     };
 
+
+    int visualization_primitive;
+    int terrain_gen_type;
+
     // Scene Manager
     std::string _name;
     Scene_Manager& _sceneManager;
     double elapsedTime;
 
     // Lighting
-    int visualization_primitive;
     glm::vec3 light_position;
 
     // Perlin Noise Stuff
@@ -261,7 +264,6 @@ private:
     
 	void GenerateTerrainDLA();
     void GenerateDLATerrain(int stage);
-    bool useDLA;
 
     // Regenerate
     void RegenerateNoise();

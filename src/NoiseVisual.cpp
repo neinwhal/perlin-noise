@@ -120,12 +120,11 @@ void PerlinNoise::draw() {
     glUniform3f(uniform_uViewPos, main_camera.get_position().x, main_camera.get_position().y, main_camera.get_position().z);
 
     // Draw both noise terrains
-    if (useDLA) {
+    if (terrain_gen_type == 2) {
         M = glm::mat4(1.0f);
 
         M = glm::translate(M, glm::vec3(0.0f, 0.0f, 0.0f));
         M = glm::scale(M, glm::vec3{ 20.f, 20.f, 20.f });
-
 
         MV = VP * M;
         mvp = PP * MV;
@@ -133,28 +132,39 @@ void PerlinNoise::draw() {
         glBindVertexArray(vao[DLA_NOISE]);
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices[DLA_NOISE].size()), GL_UNSIGNED_INT, 0);
     }
-    else {
-        for (int i = 0; i < 4; ++i) {
+    else if (terrain_gen_type == 1) {
+        for (int i = 2; i < 4; ++i) {
             M = glm::mat4(1.0f);
-
-            if (i == 0) { // Proper perlin noise
-                M = glm::translate(M, glm::vec3(-20.0f, 0.0f, 0.0f));
+            if (i == 2) { // perlin noise + gradient
+                M = glm::translate(M, glm::vec3(-12.5f, 0.0f, 0.0f));
                 M = glm::scale(M, glm::vec3{ 20.f, 20.f, 20.f });
             }
-			if (i == 1) // Proper perlin noise + gradient
+            if (i == 3) // alt perlin noise + gradient
             {
-                M = glm::translate(M, glm::vec3(5.0f, 0.0f, 0.0f));
+                M = glm::translate(M, glm::vec3(12.5f, 0.0f, 0.0f));
                 M = glm::scale(M, glm::vec3{ 20.f, 20.f, 20.f });
+            }
 
-            }
-            if (i == 2) { // alternate perlin noise
-                M = glm::translate(M, glm::vec3(30.0f, 0.0f, 0.0f));
+            MV = VP * M;
+            mvp = PP * MV;
+            glUniformMatrix4fv(uniform_mvpMatrix, 1, GL_FALSE, glm::value_ptr(mvp));
+            glBindVertexArray(vao[i]);
+            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices[i].size()), GL_UNSIGNED_INT, 0);
+        }
+
+    }
+    else if (terrain_gen_type == 0) {
+        for (int i = 0; i < 2; ++i) {
+            M = glm::mat4(1.0f);
+            if (i == 0) { // perlin noise
+                M = glm::translate(M, glm::vec3(-12.5f, 0.0f, 0.0f));
                 M = glm::scale(M, glm::vec3{ 20.f, 20.f, 20.f });
             }
-			if (i == 3) { // alternate perlin noise + gradient
-				M = glm::translate(M, glm::vec3(60.0f, 0.0f, 0.0f));
-				M = glm::scale(M, glm::vec3{ 20.f, 20.f, 20.f });
-			}
+            if (i == 1) // alt perlin noise
+            {
+                M = glm::translate(M, glm::vec3(12.5f, 0.0f, 0.0f));
+                M = glm::scale(M, glm::vec3{ 20.f, 20.f, 20.f });
+            }
 
             MV = VP * M;
             mvp = PP * MV;
@@ -182,32 +192,30 @@ void PerlinNoise::cleanup() {
 }
 
 void PerlinNoise::RegenerateNoise() {
-    if (useDLA) {
-        // DLA ///////////////////////////////////////////////////
-        GenerateDLATerrain(1);  
+    if (terrain_gen_type == 2) { // DLA
+        GenerateDLATerrain(0);  
         GenerateTerrainDLA();  
     }
-    else {
-        // Proper Perlin Noise
-        GeneratePerlinNoise();
+    else if (terrain_gen_type == 1) { // with gradient
         GeneratePerlindNoiseWithGradient();
-
-        // Alt Perlin Noise
-        GenerateAltPerlinNoise();
         GenerateAltPerlinNoiseWithGradient();
+
+        GeneratePerlinNoiseTerrain(perlinNoiseWithGradient, vertices[GRAIDENT_NOISE], indices[GRAIDENT_NOISE]);
+        GeneratePerlinNoiseTerrain(altPerlinNoiseWithGradient, vertices[ALT_GRAIDENT_NOISE], indices[ALT_GRAIDENT_NOISE]);
+    }
+    else { // perlin noise
+        GeneratePerlinNoise();
+        GenerateAltPerlinNoise();
 
         // Generate terrain for both planes
         GeneratePerlinNoiseTerrain(perlinNoise, vertices[PERLIN_NOISE], indices[PERLIN_NOISE]);
-        GeneratePerlinNoiseTerrain(perlinNoiseWithGradient, vertices[GRAIDENT_NOISE], indices[GRAIDENT_NOISE]);
-       
         GeneratePerlinNoiseTerrain(altPerlinNoise, vertices[ALT_PERLIN_NOISE], indices[ALT_PERLIN_NOISE]);
-        GeneratePerlinNoiseTerrain(altPerlinNoiseWithGradient, vertices[ALT_GRAIDENT_NOISE], indices[ALT_GRAIDENT_NOISE]);
     }
 
     // Update GPU buffers
-    int numTerrainTypes = useDLA ? 1 : 4;
+    int numTerrainTypes = (terrain_gen_type == 2) ? 1 : 2;
     for (int i = 0; i < numTerrainTypes; ++i) {
-        int terrainType = useDLA ? DLA_NOISE : i;
+        int terrainType = (terrain_gen_type == 2) ? DLA_NOISE : i;
         glBindBuffer(GL_ARRAY_BUFFER, vbo[terrainType]);
         glBufferData(GL_ARRAY_BUFFER, vertices[terrainType].size() * sizeof(Vertex), vertices[terrainType].data(), GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[terrainType]);
